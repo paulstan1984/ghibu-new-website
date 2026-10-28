@@ -1,62 +1,70 @@
-# EmDash Blog Template
+# Liceul Teoretic „Onisifor Ghibu”
 
-A clean, minimal blog built with [EmDash](https://github.com/emdash-cms/emdash). Runs on any Node.js server with SQLite and local file storage.
+Site de prezentare în limba română, construit cu Astro și EmDash. Rulează pe Node.js și folosește SQLite și stocare locală pentru mediile de dezvoltare și producție.
 
-![Blog template homepage](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-desktop.jpg)
+## Pagini
 
-## What's Included
-
-- Featured post hero on the homepage
-- Post archive with reading time estimates
-- Category and tag archives
-- Full-text search
-- RSS feed
-- SEO metadata and JSON-LD
-- Dark/light mode
-
-## Pages
-
-| Page | Route |
+| Pagină | Rută |
 |---|---|
-| Homepage | `/` |
-| All posts | `/posts` |
-| Single post | `/posts/:slug` |
-| Category archive | `/category/:slug` |
-| Tag archive | `/tag/:slug` |
-| Search | `/search` |
-| Static pages | `/pages/:slug` |
-| 404 | fallback |
+| Pagina principală | `/` |
+| Despre liceu | `/despre-noi` |
+| Anunțuri | `/noutati` |
+| Profesori | `/profesori` |
+| Elevi | `/elevi` |
+| Proiecte și activități | `/proiecte` |
+| Documente | `/documente` |
+| Admitere | `/admitere` |
+| Contact | `/contact` |
+| Căutare | `/cautare` |
+| Pagini importate din WordPress | `/:slug` |
 
-## Screenshots
+Rutele publice vechi ale blogului redirecționează către secțiunile echivalente ale site-ului.
 
-| | Desktop | Mobile |
-|---|---|---|
-| Light | ![homepage light desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-desktop.jpg) | ![homepage light mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-mobile.jpg) |
-| Dark | ![homepage dark desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-dark-desktop.jpg) | ![homepage dark mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-dark-mobile.jpg) |
-
-## Infrastructure
-
-- **Runtime:** Node.js
-- **Database:** SQLite (local file)
-- **Storage:** Local filesystem
-- **Framework:** Astro with `@astrojs/node`
-
-## Getting Started
+## Dezvoltare locală
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open http://localhost:4321/_emdash/admin and complete the setup wizard. EmDash runs database migrations and applies the blog seed during setup. The site is available at http://localhost:4321.
+Site-ul rulează la `http://localhost:4321`, iar panoul EmDash la `http://localhost:4321/_emdash/admin`. Pentru a încărca modelul și conținutul în baza SQLite configurată, aplică seed-ul:
 
-## Want Cloudflare Instead?
+```powershell
+npx emdash seed .\seed\seed.json --database .\data.db --uploads-dir .\uploads
+```
 
-See the [Cloudflare variant](../blog-cloudflare) for a version that deploys to Cloudflare Workers with D1 and R2.
+Dacă `DATABASE_PATH` sau `MEDIA_DIRECTORY` au alte valori, folosește aceleași căi pentru opțiunile `--database` și `--uploads-dir`.
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/emdash-cms/templates/tree/main/blog-cloudflare)
+Configurația poate fi făcută în `.env` (vezi `.env.example`):
 
-## See Also
+- `DATABASE_PATH` — fișierul SQLite; implicit `./data.db`.
+- `MEDIA_DIRECTORY` — directorul media EmDash; implicit `./uploads`.
+- `WORDPRESS_UPLOADS_DIR` — directorul arhivei WordPress folosit de ruta `/wp-content/uploads/...`.
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SCHOOL_MAIL_FROM` — configurarea livrării formularelor.
+- `SCHOOL_CONTACT_RECIPIENT` — destinatar opțional; implicit `office@liceul-onisifor-ghibu.ro`.
 
-- [All templates](../)
-- [EmDash documentation](https://docs.emdashcms.com/)
+Arhiva media curentă poate fi folosită local cu `WORDPRESS_UPLOADS_DIR=..\uploads`. Fișierele absente sunt redirecționate către site-ul WordPress original.
+
+## Importul conținutului WordPress
+
+```powershell
+python .\scripts\migrate-wordpress.py `
+  --sql C:\work\www\onisifor-ghibu\liceulon_db.sql `
+  --uploads C:\work\www\onisifor-ghibu\uploads `
+  --output .\seed\seed.json
+```
+
+Importul păstrează paginile și anunțurile publicate relevante, dar exclude intrări demonstrative și conținut placeholder al temei WordPress. Definițiile originale ale formularelor și trimiterile anterioare nu sunt incluse în export și nu sunt importate.
+
+## Producție și verificare
+
+Configurează `DATABASE_PATH` și directoarele de stocare în timpul build-ului de producție și la runtime, către volume persistente cu permisiuni de scriere pentru procesul Node.js. `WORDPRESS_UPLOADS_DIR` este citit de ruta media la runtime. Backup-ul trebuie să includă baza SQLite, fișierele media EmDash și arhiva WordPress folosită de ruta media. Testează restaurarea backup-ului înainte de lansare.
+
+Înainte de lansare:
+
+```bash
+npm run typecheck
+npm run build
+```
+
+Configurează și testează SMTP înainte de a activa formularul; până atunci endpointul afișează o eroare explicită, fără să confirme în mod fals trimiterea mesajelor.

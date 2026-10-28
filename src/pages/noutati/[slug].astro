@@ -1,0 +1,14 @@
+---
+import { decodeSlug, getEmDashEntry } from "emdash";
+import SchoolContentDetail from "../../components/SchoolContentDetail.astro";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.rewrite("/404");
+
+const { entry, error, cacheHint } = await getEmDashEntry("announcements", slug);
+if (error) return new Response("Nu am putut încărca anunțul.", { status: 500 });
+if (!entry) return Astro.rewrite("/404");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+---
+
+<SchoolContentDetail collection="announcements" entry={entry} />

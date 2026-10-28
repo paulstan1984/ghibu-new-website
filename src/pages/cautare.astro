@@ -1,0 +1,174 @@
+---
+export const prerender = false;
+
+import { search } from "emdash";
+import Base from "../layouts/Base.astro";
+
+const query = Astro.url.searchParams.get("q")?.trim().slice(0, 200) || "";
+const collections = ["announcements", "pages", "teachers", "courses", "events"];
+const result = query
+	? await search(query, { collections, limit: 30, locale: "ro" })
+	: { items: [], nextCursor: undefined };
+
+const paths: Record<string, (slug: string) => string> = {
+	announcements: (slug) => `/noutati/${slug}`,
+	pages: (slug) => `/${slug}`,
+	teachers: (slug) => `/profesori/${slug}`,
+	courses: (slug) => `/programe/${slug}`,
+	events: (slug) => `/evenimente/${slug}`,
+};
+
+function escapeHtml(text: string): string {
+	return text
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#39;");
+}
+
+const rows = result.items.flatMap((item) => {
+	const route = paths[item.collection];
+	if (!route) return [];
+	const title = item.title ?? "Fără titlu";
+	const snippetIsTitle =
+		item.snippet?.replaceAll("<mark>", "").replaceAll("</mark>", "") ===
+		escapeHtml(title);
+	return [{
+		path: route(item.slug ?? item.id),
+		title,
+		titleHtml: snippetIsTitle ? item.snippet : undefined,
+		snippet: snippetIsTitle ? undefined : item.snippet,
+	}];
+});
+---
+
+<Base
+	title={query ? `Căutare: ${query}` : "Căutare"}
+	description="Caută anunțuri, pagini și informații publicate de liceu."
+>
+	<header class="band intro">
+		<div class="frame school-search-intro">
+			<p class="eyebrow">Căutare în site</p>
+			<h1 class="intro__title">Cu ce te putem ajuta?</h1>
+			<form method="get" action="/cautare" role="search" aria-label="Caută în site">
+				<label for="search-query" class="sr-only">Termeni de căutare</label>
+				<div class="search-field">
+					<input
+						id="search-query"
+						class="search-field__input"
+						type="search"
+						name="q"
+						value={query}
+						placeholder="Scrie un cuvânt sau o expresie"
+					/>
+					<button type="submit" class="btn search-field__submit">Caută</button>
+				</div>
+			</form>
+		</div>
+	</header>
+	{query && (
+		<section class="band section">
+			<div class="frame school-search-results">
+				{rows.length ? (
+					<>
+						<p class="eyebrow">
+							{result.nextCursor ? `Primele ${rows.length} rezultate` : `${rows.length} rezultate`}
+						</p>
+						<ol>
+							{rows.map((row) => (
+								<li>
+									<h2>
+										<a href={row.path}>
+											{row.titleHtml ? <Fragment set:html={row.titleHtml} /> : row.title}
+										</a>
+									</h2>
+									{row.snippet && <p set:html={row.snippet} />}
+									<span dir="ltr">{row.path}</span>
+								</li>
+							))}
+						</ol>
+					</>
+				) : (
+					<div class="school-empty">
+						<h2>Nu am găsit rezultate pentru „{query}”.</h2>
+						<p>Încearcă alți termeni sau verifică scrierea.</p>
+					</div>
+				)}
+			</div>
+		</section>
+	)}
+</Base>
+
+<style>
+	.school-search-intro {
+		padding-block: clamp(3rem, 7vw, 6rem);
+	}
+
+	.school-search-intro .intro__title {
+		margin-block: 0.4rem 1.5rem;
+	}
+
+	.school-search-intro form {
+		max-width: 700px;
+	}
+
+	.school-search-intro .search-field {
+		display: flex;
+		gap: 0.75rem;
+	}
+
+	.school-search-intro .search-field__input {
+		flex: 1;
+		min-width: 0;
+		padding: 0.8rem 1rem;
+		border: 1px solid var(--color-border-strong);
+		border-radius: var(--radius-full);
+		background: var(--color-surface);
+		color: var(--color-text);
+		font: inherit;
+	}
+
+	.school-search-results {
+		max-width: 850px;
+	}
+
+	.school-search-results ol {
+		margin-top: 1rem;
+		list-style: none;
+	}
+
+	.school-search-results li {
+		padding-block: 1rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.school-search-results h2 {
+		font-size: 1.25rem;
+	}
+
+	.school-search-results h2 a {
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.school-search-results li p {
+		margin-top: 0.45rem;
+		color: var(--color-text-secondary);
+		line-height: 1.6;
+	}
+
+	.school-search-results li span {
+		display: block;
+		margin-top: 0.4rem;
+		color: var(--color-muted);
+		font-size: var(--font-size-xs);
+	}
+
+	@media (max-width: 540px) {
+		.school-search-intro .search-field {
+			align-items: stretch;
+			flex-direction: column;
+		}
+	}
+</style>

@@ -1,0 +1,100 @@
+---
+import { getEmDashCollection } from "emdash";
+import Base from "../layouts/Base.astro";
+
+const { entries, error, cacheHint } = await getEmDashCollection("pages", {
+	limit: 100,
+	orderBy: { title: "asc" },
+});
+if (error) return new Response("Nu am putut încărca informațiile pentru elevi.", { status: 500 });
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const studentPages = entries.filter((entry) =>
+	(entry.id + " " + entry.data.title).toLocaleLowerCase("ro").match(
+		/elev|burse|olimpiad|rezultat|consili|bibliotec|biblioteca|ghibstock/,
+	),
+);
+---
+
+<Base title="Elevi" description="Resurse și oportunități pentru elevii Liceului Teoretic „Onisifor Ghibu”.">
+	<header class="band intro">
+		<div class="frame school-page-intro">
+			<p class="eyebrow">Comunitatea elevilor</p>
+			<h1 class="intro__title">Viața de elev</h1>
+			<p class="intro__lead">Resurse, rezultate și activități pentru fiecare etapă a parcursului școlar.</p>
+		</div>
+	</header>
+	<section class="band section">
+		<div class="frame school-student-grid">
+			<a href="/documente" class="school-student-card">
+				<span class="eyebrow">Resurse</span>
+				<h2>Documente pentru elevi</h2>
+				<p>Cereri, regulamente și informații utile într-un singur loc.</p>
+				<span class="text-link">Deschide arhiva <span aria-hidden="true">→</span></span>
+			</a>
+			<a href="/proiecte" class="school-student-card">
+				<span class="eyebrow">Implicare</span>
+				<h2>Proiecte și evenimente</h2>
+				<p>Descoperă activitățile și programele liceului.</p>
+				<span class="text-link">Vezi activitățile <span aria-hidden="true">→</span></span>
+			</a>
+			{studentPages.map((entry) => (
+				<a href={`/${entry.id}`} class="school-student-card">
+					<span class="eyebrow">Din comunitatea noastră</span>
+					<h2>{entry.data.title}</h2>
+					{entry.data.excerpt && <p>{entry.data.excerpt}</p>}
+					<span class="text-link">Citește mai mult <span aria-hidden="true">→</span></span>
+				</a>
+			))}
+		</div>
+	</section>
+</Base>
+
+<style>
+	.school-student-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.school-student-card {
+		display: flex;
+		min-height: 15rem;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 1.4rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		background: var(--color-surface);
+		box-shadow: var(--shadow-card);
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.school-student-card h2 {
+		margin-top: 0.4rem;
+		font-size: 1.35rem;
+	}
+
+	.school-student-card p {
+		margin-top: 0.5rem;
+		color: var(--color-text-secondary);
+		line-height: 1.6;
+	}
+
+	.school-student-card .text-link {
+		margin-top: auto;
+	}
+
+	@media (max-width: 850px) {
+		.school-student-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 560px) {
+		.school-student-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

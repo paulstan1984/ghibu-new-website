@@ -1,0 +1,116 @@
+---
+import { getEmDashCollection } from "emdash";
+import Base from "../layouts/Base.astro";
+
+const [coursesResult, eventsResult] = await Promise.all([
+	getEmDashCollection("courses", { orderBy: { title: "asc" }, limit: 100 }),
+	getEmDashCollection("events", { orderBy: { source_date: "desc" }, limit: 100 }),
+]);
+if (coursesResult.error || eventsResult.error) {
+	return new Response("Nu am putut încărca proiectele și evenimentele.", { status: 500 });
+}
+if (Astro.cache?.enabled) {
+	Astro.cache.set(coursesResult.cacheHint);
+	Astro.cache.set(eventsResult.cacheHint);
+}
+---
+
+<Base title="Proiecte și activități" description="Proiectele, programele și evenimentele liceului.">
+	<header class="band intro">
+		<div class="frame school-page-intro">
+			<p class="eyebrow">Dincolo de sala de clasă</p>
+			<h1 class="intro__title">Proiecte și activități</h1>
+			<p class="intro__lead">Oportunități de învățare, colaborare și implicare pentru elevii noștri.</p>
+		</div>
+	</header>
+	<section class="band section">
+		<div class="frame school-activity-sections">
+			<section aria-labelledby="courses-title">
+				<div class="section-head school-section-head">
+					<h2 id="courses-title" class="section-head__title">Programe și cursuri</h2>
+				</div>
+				<div class="school-activity-grid">
+					{coursesResult.entries.map((entry) => (
+						<a class="school-activity-card" href={`/programe/${entry.id}`}>
+							<p class="eyebrow">Program educațional</p>
+							<h3>{entry.data.title}</h3>
+							{entry.data.excerpt && <p>{entry.data.excerpt}</p>}
+							<span class="text-link">Află mai multe <span aria-hidden="true">→</span></span>
+						</a>
+					))}
+					{coursesResult.entries.length === 0 && <p class="school-empty">Programele vor fi publicate aici.</p>}
+				</div>
+			</section>
+			<section aria-labelledby="events-title">
+				<div class="section-head school-section-head">
+					<h2 id="events-title" class="section-head__title">Evenimente</h2>
+				</div>
+				<div class="school-activity-grid">
+					{eventsResult.entries.map((entry) => (
+						<a class="school-activity-card" href={`/evenimente/${entry.id}`}>
+							<p class="eyebrow">Eveniment școlar</p>
+							<h3>{entry.data.title}</h3>
+							{entry.data.excerpt && <p>{entry.data.excerpt}</p>}
+							<span class="text-link">Detalii <span aria-hidden="true">→</span></span>
+						</a>
+					))}
+					{eventsResult.entries.length === 0 && <p class="school-empty">Evenimentele vor fi publicate aici.</p>}
+				</div>
+			</section>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.school-activity-sections {
+		display: grid;
+		gap: 3rem;
+	}
+
+	.school-activity-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.school-activity-card {
+		display: flex;
+		min-height: 15rem;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 1.4rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		background: var(--color-surface);
+		box-shadow: var(--shadow-card);
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.school-activity-card h3 {
+		margin-top: 0.4rem;
+		font-size: 1.3rem;
+	}
+
+	.school-activity-card > p:not(.eyebrow) {
+		margin-top: 0.6rem;
+		color: var(--color-text-secondary);
+		line-height: 1.6;
+	}
+
+	.school-activity-card .text-link {
+		margin-top: auto;
+	}
+
+	@media (max-width: 760px) {
+		.school-activity-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 540px) {
+		.school-activity-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

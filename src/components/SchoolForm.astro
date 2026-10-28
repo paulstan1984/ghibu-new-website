@@ -1,0 +1,247 @@
+---
+interface Props {
+	variant?: "contact" | "welcome";
+}
+
+const { variant = "contact" } = Astro.props;
+const isWelcome = variant === "welcome";
+const formId = `school-form-${variant}`;
+---
+
+<form class="school-form" action="/api/forms/contact" method="post" data-school-form>
+	<input type="hidden" name="form" value={variant} />
+	<div class="school-form__trap" aria-hidden="true">
+		<label for={`${formId}-company`}>Nu completați acest câmp</label>
+		<input
+			id={`${formId}-company`}
+			name="website"
+			type="text"
+			tabindex="-1"
+			autocomplete="off"
+		/>
+	</div>
+
+	<div class="school-form__intro">
+		<p class="eyebrow">{isWelcome ? "Solicită informații" : "Contact"}</p>
+		<h2>{isWelcome ? "Cum te putem ajuta?" : "Trimite un mesaj"}</h2>
+		<p>
+			{isWelcome
+				? "Lasă-ne datele tale și mesajul; secretariatul îți va răspunde."
+				: "Sugestiile și mesajele sunt transmise secretariatului liceului."}
+		</p>
+	</div>
+
+	<div class="school-form__grid">
+		<label>
+			<span>Nume și prenume <strong aria-hidden="true">*</strong></span>
+			<input name="name" type="text" autocomplete="name" maxlength="120" required />
+		</label>
+		<label>
+			<span>Adresă de e-mail <strong aria-hidden="true">*</strong></span>
+			<input
+				name="email"
+				type="email"
+				autocomplete="email"
+				maxlength="254"
+				required
+			/>
+		</label>
+		<label>
+			<span>Telefon</span>
+			<input name="phone" type="tel" autocomplete="tel" maxlength="40" />
+		</label>
+		<label class="school-form__wide">
+			<span>Mesaj <strong aria-hidden="true">*</strong></span>
+			<textarea name="message" rows="6" maxlength="5000" required></textarea>
+		</label>
+		<label class="school-form__consent school-form__wide">
+			<input name="privacy" type="checkbox" value="yes" required />
+			<span>
+				Am citit <a href="/confidentialitate">nota de informare privind datele personale</a>
+				și sunt de acord ca liceul să folosească datele mele pentru a răspunde acestui mesaj.
+			</span>
+		</label>
+	</div>
+
+	<div class="school-form__actions">
+		<button class="btn" type="submit">Trimite mesajul</button>
+		<p class="school-form__required"><strong>*</strong> Câmpuri obligatorii</p>
+	</div>
+	<p class="school-form__status" role="status" aria-live="polite" data-form-status></p>
+</form>
+
+<script>
+	document.querySelectorAll<HTMLFormElement>("[data-school-form]").forEach((form) => {
+		form.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+			const status = form.querySelector<HTMLElement>("[data-form-status]");
+			if (!button || !status) return;
+
+			button.disabled = true;
+			status.textContent = "Mesajul se trimite…";
+			status.dataset.state = "pending";
+
+			try {
+				const body = new URLSearchParams();
+				new FormData(form).forEach((value, key) => {
+					if (typeof value === "string") body.append(key, value);
+				});
+				const response = await fetch(form.action, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+						Accept: "application/json",
+					},
+					body,
+				});
+				const result = (await response.json()) as {
+					ok?: boolean;
+					message?: string;
+				};
+				status.textContent = result.message ?? "Nu am putut procesa mesajul.";
+				status.dataset.state = response.ok && result.ok ? "success" : "error";
+				if (response.ok && result.ok) form.reset();
+			} catch {
+				status.textContent =
+					"Nu am putut contacta serverul. Încercați din nou sau scrieți la office@liceul-onisifor-ghibu.ro.";
+				status.dataset.state = "error";
+			} finally {
+				button.disabled = false;
+			}
+		});
+	});
+</script>
+
+<style>
+	.school-form {
+		padding: clamp(1.25rem, 3vw, 2rem);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		background: var(--color-surface);
+		box-shadow: var(--shadow-card);
+	}
+
+	.school-form__intro {
+		margin-bottom: 1.5rem;
+	}
+
+	.school-form__intro h2 {
+		margin-block: 0.35rem 0.6rem;
+		font-size: clamp(1.5rem, 2.5vw, 2rem);
+	}
+
+	.school-form__intro > p:last-child {
+		color: var(--color-text-secondary);
+	}
+
+	.school-form__grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.school-form__grid label {
+		display: grid;
+		gap: 0.4rem;
+		color: var(--color-text);
+		font-size: var(--font-size-sm);
+		font-weight: 600;
+	}
+
+	.school-form__grid label strong,
+	.school-form__required strong {
+		color: var(--color-brand);
+	}
+
+	.school-form input:not([type="checkbox"]),
+	.school-form textarea {
+		width: 100%;
+		border: 1px solid var(--color-border-strong);
+		border-radius: var(--radius);
+		background: var(--color-bg);
+		color: var(--color-text);
+		font: inherit;
+		padding: 0.75rem 0.85rem;
+	}
+
+	.school-form textarea {
+		resize: vertical;
+	}
+
+	.school-form__wide {
+		grid-column: 1 / -1;
+	}
+
+	.school-form__consent {
+		display: flex !important;
+		align-items: flex-start;
+		gap: 0.65rem !important;
+		font-weight: 400 !important;
+	}
+
+	.school-form__consent input {
+		margin-top: 0.2rem;
+		accent-color: var(--color-brand);
+	}
+
+	.school-form__consent span {
+		line-height: 1.5;
+	}
+
+	.school-form__actions {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin-top: 1.25rem;
+	}
+
+	.school-form__required {
+		color: var(--color-muted);
+		font-size: var(--font-size-xs);
+	}
+
+	.school-form button:disabled {
+		cursor: wait;
+		opacity: 0.7;
+	}
+
+	.school-form__status:empty {
+		display: none;
+	}
+
+	.school-form__status {
+		margin-top: 1rem;
+		padding: 0.75rem 1rem;
+		border-radius: var(--radius);
+		background: var(--color-fill);
+	}
+
+	.school-form__status[data-state="success"] {
+		border-inline-start: 4px solid var(--color-brand);
+	}
+
+	.school-form__status[data-state="error"] {
+		border-inline-start: 4px solid #a13227;
+	}
+
+	.school-form__trap {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 640px) {
+		.school-form__grid {
+			grid-template-columns: 1fr;
+		}
+
+		.school-form__wide {
+			grid-column: auto;
+		}
+	}
+</style>

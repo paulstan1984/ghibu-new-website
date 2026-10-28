@@ -1,0 +1,58 @@
+---
+import { decodeSlug, getEmDashEntry } from "emdash";
+import { PortableText } from "emdash/ui";
+import Base from "../layouts/Base.astro";
+import SchoolForm from "../components/SchoolForm.astro";
+import WordPressImage from "../components/WordPressImage.astro";
+import "../styles/prose.css";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.rewrite("/404");
+
+const { entry, error, cacheHint } = await getEmDashEntry("pages", slug);
+if (error) return new Response("Nu am putut încărca pagina.", { status: 500 });
+if (!entry) return Astro.rewrite("/404");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const formKind =
+	entry.data.has_form && entry.data.form_kind === "welcome" ? "welcome" : "contact";
+---
+
+<Base
+	title={entry.data.title}
+	description={entry.data.excerpt || undefined}
+	content={{ collection: "pages", id: entry.data.id, slug: entry.id }}
+>
+	<article class="band page">
+		<div class="frame page__layout school-cms-page">
+			<header class="page__header">
+				<p class="eyebrow">Liceul Teoretic „Onisifor Ghibu”</p>
+				<h1 class="page__title">{entry.data.title}</h1>
+			</header>
+			<div class="prose page__body" {...entry.edit.content}>
+				<PortableText
+					value={entry.data.content ?? []}
+					components={{ type: { wordpressImage: WordPressImage } }}
+				/>
+			</div>
+			{entry.data.has_form && <SchoolForm variant={formKind} />}
+		</div>
+	</article>
+</Base>
+
+<style>
+	.school-cms-page {
+		max-width: 1000px;
+	}
+
+	.school-cms-page .page__body {
+		max-width: var(--content-width);
+		width: 100%;
+		margin-inline: auto;
+	}
+
+	.school-cms-page .school-form {
+		width: min(100%, 760px);
+		margin-inline: auto;
+	}
+</style>

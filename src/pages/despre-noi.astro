@@ -1,0 +1,156 @@
+---
+import Base from "../layouts/Base.astro";
+
+const history = [
+	{
+		year: "1961",
+		title: "Începuturile",
+		text: "În vechiul cartier Donath au fost construite primele instituții de învățământ, punând bazele unei comunități educaționale care continuă să crească.",
+	},
+	{
+		year: "1967–1977",
+		title: "Un liceu în formare",
+		text: "Școala Medie nr. 15 a devenit Liceul nr. 15, apoi Liceul de Științe ale Naturii. Comunitatea și-a conturat treptat identitatea și direcția educațională.",
+	},
+	{
+		year: "După 1989",
+		title: "O comunitate reunită",
+		text: "Liceul și școala generală s-au unit, iar instituția a preluat numele pedagogului și istoricului Onisifor Ghibu.",
+	},
+];
+---
+
+<Base
+	title="Despre liceu"
+	description="Istoria, valorile și comunitatea Liceului Teoretic „Onisifor Ghibu”."
+>
+	<header class="band intro">
+		<div class="frame school-page-intro">
+			<p class="eyebrow">Identitate și tradiție</p>
+			<h1 class="intro__title">Despre liceu</h1>
+			<p class="intro__lead">
+				Un loc în care educația, respectul și curiozitatea cresc împreună.
+			</p>
+		</div>
+	</header>
+	<section class="band section">
+		<div class="frame school-about-page">
+			<div class="school-about-page__lead">
+				<p class="eyebrow">Liceul Teoretic „Onisifor Ghibu”</p>
+				<h2>O școală pentru generațiile de azi și de mâine</h2>
+				<p>
+					De peste șase decenii, liceul face parte din viața cartierului și a
+					orașului Cluj-Napoca. Ne propunem să oferim un mediu în care elevii
+					învață să gândească, să colaboreze și să-și urmeze propriul drum.
+				</p>
+			</div>
+			<ol class="school-timeline">
+				{history.map((item) => (
+					<li>
+						<p class="eyebrow">{item.year}</p>
+						<div>
+							<h3>{item.title}</h3>
+							<p>{item.text}</p>
+						</div>
+					</li>
+				))}
+			</ol>
+			<div class="school-namesake">
+				<div>
+					<p class="eyebrow">Numele liceului</p>
+					<h2>Onisifor Ghibu</h2>
+					<p>
+						Pedagog, istoric și om de cultură, Onisifor Ghibu a susținut
+						importanța educației și a școlii în formarea unei societăți
+						responsabile.
+					</p>
+				</div>
+				<a href="/contact" class="btn">Contact și program</a>
+			</div>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.school-about-page {
+		display: grid;
+		gap: clamp(2.5rem, 6vw, 5rem);
+	}
+
+	.school-about-page__lead {
+		max-width: 760px;
+		margin-inline: auto;
+		text-align: center;
+	}
+
+	.school-about-page__lead h2,
+	.school-namesake h2 {
+		margin-block: 0.4rem 1rem;
+		font-size: clamp(2rem, 4vw, 3.25rem);
+		line-height: 1.1;
+		letter-spacing: -0.04em;
+	}
+
+	.school-about-page__lead > p:last-child,
+	.school-namesake > div > p:last-child {
+		color: var(--color-text-secondary);
+		line-height: 1.75;
+	}
+
+	.school-timeline {
+		display: grid;
+		max-width: 850px;
+		gap: 0;
+		margin-inline: auto;
+		list-style: none;
+	}
+
+	.school-timeline li {
+		display: grid;
+		grid-template-columns: 150px minmax(0, 1fr);
+		gap: 1.5rem;
+		padding-block: 1.4rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.school-timeline li > div {
+		padding-inline-start: 1.5rem;
+		border-inline-start: 3px solid var(--color-brand);
+	}
+
+	.school-timeline h3 {
+		margin-bottom: 0.4rem;
+		font-size: 1.3rem;
+	}
+
+	.school-timeline li > div > p {
+		color: var(--color-text-secondary);
+		line-height: 1.7;
+	}
+
+	.school-namesake {
+		display: flex;
+		align-items: end;
+		justify-content: space-between;
+		gap: 2rem;
+		padding: clamp(1.5rem, 4vw, 3rem);
+		border-radius: var(--radius-xl);
+		background: var(--color-fill);
+	}
+
+	.school-namesake > div {
+		max-width: 65ch;
+	}
+
+	@media (max-width: 620px) {
+		.school-timeline li {
+			grid-template-columns: 1fr;
+			gap: 0.65rem;
+		}
+
+		.school-namesake {
+			align-items: flex-start;
+			flex-direction: column;
+		}
+	}
+</style>

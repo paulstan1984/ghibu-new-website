@@ -51,11 +51,23 @@
    - Ensure the production host provides persistent writable storage for the database and uploaded media, and define backup/restore procedures.
    - Verify migrated-content counts, forms, images and downloads, links and redirects, mobile layouts, accessibility, and SEO metadata.
 
+## Implementation status
+
+- Implemented Romanian school navigation, presentation homepage, about, admissions, student resources, contact, privacy, announcements, documents, projects, and search pages.
+- Added detail routes for announcements, teachers, programs, events, and imported WordPress pages, with redirects from the former blog routes.
+- Added a repeatable SQL-to-EmDash seed generator. It skips identifiable theme-demo pages, placeholder announcements, and sample teachers/programs/events rather than presenting them as school information.
+- The generated seed contains 28 school pages and 15 announcements; the six programs, six events, and eight teacher entries in the export were identifiable theme placeholders and are excluded.
+- Added a local WordPress media route with path/symlink containment checks and a legacy-host fallback for files absent from the partial archive.
+- Recreated contact and information-request forms. Historical form submissions are not migrated.
+- Configured SQLite and local storage through environment variables for both development and production.
+
 ## Outstanding dependencies
 
-- Confirm each form's non-public notification recipients, confirmation behavior, email-delivery configuration, and spam protection.
+- Confirm final form fields and any school-specific notification or confirmation requirements. The SQL export did not include the original form definitions.
+- Configure and verify SMTP delivery in the target environment before accepting form submissions.
 - Supply older media that must be retained but is absent from the available uploads folder, or approve omitting unavailable assets.
 - Confirm production hosting supports persistent local storage for SQLite and media, and establish backups.
+- Run the site against the migrated seed, verify content/media/routes/forms, and complete production deployment testing.
 
 ## Completion criteria
 

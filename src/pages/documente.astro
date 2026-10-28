@@ -1,0 +1,92 @@
+---
+import { getEmDashCollection } from "emdash";
+import Base from "../layouts/Base.astro";
+import { formatDate } from "../utils/locale";
+
+const { entries, error, cacheHint } = await getEmDashCollection("announcements", {
+	orderBy: { source_date: "desc" },
+	limit: 100,
+});
+if (error) return new Response("Nu am putut încărca documentele.", { status: 500 });
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const documents = entries.filter((entry) =>
+	(entry.data.title + " " + entry.data.excerpt).toLocaleLowerCase("ro").match(
+		/document|cerere|formular|regulament|calendar|metodolog|rezultat|admit|transfer|înscr|inscr/,
+	),
+);
+---
+
+<Base title="Documente" description="Documente și informații utile publicate de liceu.">
+	<header class="band intro">
+		<div class="frame school-page-intro">
+			<p class="eyebrow">Resurse utile</p>
+			<h1 class="intro__title">Documente</h1>
+			<p class="intro__lead">Accesează anunțuri, formulare și documente publicate de liceu.</p>
+		</div>
+	</header>
+	<section class="band section">
+		<div class="frame school-documents">
+			{documents.length ? documents.map((entry) => (
+				<article>
+					<div>
+						{entry.data.source_date && (
+							<time class="eyebrow" datetime={new Date(entry.data.source_date).toISOString()}>
+								{formatDate(new Date(entry.data.source_date), "short")}
+							</time>
+						)}
+						<h2><a href={`/noutati/${entry.id}`}>{entry.data.title}</a></h2>
+						{entry.data.excerpt && <p>{entry.data.excerpt}</p>}
+					</div>
+					<a class="btn btn--ghost" href={`/noutati/${entry.id}`}>Deschide <span aria-hidden="true">→</span></a>
+				</article>
+			)) : <p class="school-empty">Documentele vor fi adăugate aici pe măsură ce sunt publicate.</p>}
+		</div>
+	</section>
+</Base>
+
+<style>
+	.school-documents {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.school-documents article {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		padding: 1.25rem 1.4rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface);
+	}
+
+	.school-documents h2 {
+		margin-block: 0.25rem;
+		font-size: 1.1rem;
+	}
+
+	.school-documents h2 a {
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.school-documents p {
+		margin-top: 0.35rem;
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+	}
+
+	.school-documents .btn {
+		flex: 0 0 auto;
+	}
+
+	@media (max-width: 600px) {
+		.school-documents article {
+			align-items: flex-start;
+			flex-direction: column;
+			gap: 1rem;
+		}
+	}
+</style>

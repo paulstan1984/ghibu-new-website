@@ -2,7 +2,7 @@ import { getI18nConfig } from "emdash";
 
 /**
  * The default locale from the site's Astro `i18n` config, if it names a
- * language this runtime can format. Callers fall back to English when it's
+ * language this runtime can format. Callers fall back to Romanian when it's
  * undefined.
  */
 export function getSiteLocale(): string | undefined {
@@ -16,9 +16,9 @@ export function getSiteLocale(): string | undefined {
 	}
 }
 
-/** Formats a date in the site's locale, or in US English without one. */
+/** Formats a date in the site's locale, or in Romanian without one. */
 export function formatDate(date: Date, month: "long" | "short"): string {
-	return date.toLocaleDateString(getSiteLocale() ?? "en-US", {
+	return date.toLocaleDateString(getSiteLocale() ?? "ro-RO", {
 		year: "numeric",
 		month,
 		day: "numeric",

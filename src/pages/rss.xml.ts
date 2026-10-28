@@ -8,24 +8,29 @@ export const GET: APIRoute = async ({ site, url }) => {
 	const siteUrl = site ?? new URL(url.origin);
 	const { siteTitle, siteTagline } = resolveBlogSiteIdentity(await getSiteSettings());
 
-	const { entries: posts } = await getEmDashCollection("posts", {
-		orderBy: { published_at: "desc" },
+	const { entries, error } = await getEmDashCollection("announcements", {
+		orderBy: { source_date: "desc" },
 		limit: 20,
 	});
+	if (error) {
+		console.error("Could not load announcements for the RSS feed.", error);
+		return new Response("Nu am putut genera fluxul de anunțuri.", { status: 500 });
+	}
 
-	const items = posts
-		.map((post) => {
-			if (!post.data.publishedAt) return null;
-			const pubDate = post.data.publishedAt.toUTCString();
+	const items = entries
+		.map((entry) => {
+			if (!entry.data.source_date) return null;
+			const publishedAt = new Date(entry.data.source_date);
+			if (!Number.isFinite(publishedAt.getTime())) return null;
+			const pubDate = publishedAt.toUTCString();
 
-			const postUrl = new URL(`/posts/${post.id}`, siteUrl).href;
-			const title = escapeXml(post.data.title || "Untitled");
-			const description = escapeXml(post.data.excerpt || "");
-
+			const entryUrl = new URL(`/noutati/${entry.id}`, siteUrl).href;
+			const title = escapeXml(entry.data.title || "Fără titlu");
+			const description = escapeXml(entry.data.excerpt || "");
 			return `    <item>
       <title>${title}</title>
-      <link>${postUrl}</link>
-      <guid isPermaLink="true">${postUrl}</guid>
+      <link>${entryUrl}</link>
+      <guid isPermaLink="true">${entryUrl}</guid>
       <pubDate>${pubDate}</pubDate>
       <description>${description}</description>
     </item>`;
@@ -40,7 +45,7 @@ export const GET: APIRoute = async ({ site, url }) => {
     <description>${escapeXml(siteTagline)}</description>
 	<link>${siteUrl.href}</link>
 	<atom:link href="${new URL("/rss.xml", siteUrl).href}" rel="self" type="application/rss+xml"/>
-    <language>${getSiteLocale() ?? "en-us"}</language>
+    <language>${getSiteLocale() ?? "ro"}</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${items}
   </channel>

@@ -1,194 +1,614 @@
 ---
-import {
-	getEmDashCollection,
-	getTermsForEntries,
-	getSiteSettings,
-} from "emdash";
+import { getEmDashCollection, getEmDashEntry } from "emdash";
 import Base from "../layouts/Base.astro";
-import PostCard from "../components/PostCard.astro";
-import { resolveBlogSiteIdentity } from "../utils/site-identity";
+import { formatDate } from "../utils/locale";
 
-// Limit to what we render (1 featured + 6 grid). The DB does the slicing
-// instead of fetching every post and discarding the tail in JS.
-const POSTS_PER_PAGE = 7;
+const [announcementResult, coursesResult, eventsResult, homeResult] =
+	await Promise.all([
+		getEmDashCollection("announcements", {
+			orderBy: { source_date: "desc" },
+			limit: 5,
+		}),
+		getEmDashCollection("courses", { orderBy: { title: "asc" }, limit: 3 }),
+		getEmDashCollection("events", { orderBy: { source_date: "desc" }, limit: 3 }),
+		getEmDashEntry("pages", "home-1"),
+	]);
 
-const [{ entries: posts, cacheHint }, settings] = await Promise.all([
-	getEmDashCollection("posts", {
-		orderBy: { published_at: "desc" },
-		limit: POSTS_PER_PAGE + 1, // +1 to detect "view all" need
-	}),
-	getSiteSettings(),
-]);
-const { siteTitle, siteTagline } = resolveBlogSiteIdentity(settings);
+if (announcementResult.error || coursesResult.error || eventsResult.error || homeResult.error) {
+	return new Response("Nu am putut încărca datele paginii principale.", {
+		status: 500,
+	});
+}
 
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+if (Astro.cache?.enabled) {
+	Astro.cache.set(announcementResult.cacheHint);
+	Astro.cache.set(coursesResult.cacheHint);
+	Astro.cache.set(eventsResult.cacheHint);
+	if (homeResult.cacheHint) Astro.cache.set(homeResult.cacheHint);
+}
 
-// Trim the lookahead post used to detect overflow
-const visiblePosts = posts.slice(0, POSTS_PER_PAGE);
-const hasMorePosts = posts.length > POSTS_PER_PAGE;
-
-// Find the first post with a featured image for the hero
-const featuredPost = visiblePosts.find((p) => p.data.featured_image);
-const featuredIndex = featuredPost ? visiblePosts.indexOf(featuredPost) : -1;
-
-// Get remaining posts (exclude featured if found, limit to 6 for grid)
-const gridPosts = visiblePosts
-	.filter((_, i) => i !== featuredIndex)
-	.slice(0, 6);
-
-// Single batched query for tags across the featured post + grid posts.
-// Avoids the N+1 pattern of calling getEntryTerms() per entry.
-// Bylines are already hydrated on entry.data.bylines by getEmDashCollection.
-const tagEntryIds = [
-	...(featuredPost ? [featuredPost.data.id] : []),
-	...gridPosts.map((p) => p.data.id),
-];
-const tagsByEntry = await getTermsForEntries("posts", tagEntryIds, "tag");
-
-const featuredTags = featuredPost
-	? (tagsByEntry.get(featuredPost.data.id) ?? []).map((t) => ({
-			slug: t.slug,
-			label: t.label,
-		}))
-	: [];
-
-const gridPostsWithTags = gridPosts.map((post) => ({
-	post,
-	tags: (tagsByEntry.get(post.data.id) ?? []).map((t) => ({
-		slug: t.slug,
-		label: t.label,
-	})),
-}));
+const announcements = announcementResult.entries;
+const courses = coursesResult.entries;
+const events = eventsResult.entries;
+const heroImage =
+	homeResult.entry?.data.featured_image_url ||
+	"/wp-content/uploads/2022/03/LTOG_084-1024x586.jpg";
 ---
 
-<Base title={siteTitle} description={siteTagline}>
-	<header class="band intro">
-		<div class="frame home-intro">
-			<div>
-				<p class="eyebrow">Blog</p>
-				<h1 class="intro__title">{siteTitle}</h1>
-				{siteTagline && <p class="intro__subtitle">{siteTagline}</p>}
+<Base
+	title="Acasă"
+	description="Liceul Teoretic „Onisifor Ghibu” din Cluj-Napoca: educație, performanță și comunitate."
+>
+	<section class="school-hero" aria-labelledby="school-title">
+		<img
+			class="school-hero__image"
+			src={heroImage}
+			alt="Elevi și profesori ai Liceului Teoretic „Onisifor Ghibu”"
+			fetchpriority="high"
+		/>
+		<div class="school-hero__shade"></div>
+		<div class="frame school-hero__content">
+			<p class="school-hero__eyebrow">Liceul Teoretic • Cluj-Napoca</p>
+			<h1 id="school-title">Învățăm împreună.<br />Construim viitorul.</h1>
+			<p>
+				O comunitate educațională în care curiozitatea, respectul și performanța
+				deschid drumuri.
+			</p>
+			<div class="school-hero__actions">
+				<a href="/despre-noi" class="btn">Descoperă liceul</a>
+				<a href="/admitere" class="btn btn--light">Informații despre admitere</a>
 			</div>
-			<a
-				href="/rss.xml"
-				type="application/rss+xml"
-				class="btn btn--ghost btn--sm home-intro__rss"
-			>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.75"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<path d="M4 11a9 9 0 0 1 9 9"></path>
-					<path d="M4 4a16 16 0 0 1 16 16"></path>
-					<circle cx="5" cy="19" r="1"></circle>
-				</svg>
-				RSS feed
-			</a>
 		</div>
-	</header>
+		<a class="school-hero__scroll" href="#anunturi">Descoperă liceul <span aria-hidden="true">↓</span></a>
+	</section>
 
-	{
-		posts.length === 0 ? (
-			<section class="band section">
-				<div class="frame">
-					<div class="empty-state">
-						<h2 class="empty-state__title">No posts yet</h2>
-						<p class="empty-state__text">
-							Create your first post in the admin panel.
-						</p>
-						<div class="empty-state__actions">
-							<a href="/_emdash/admin/content/posts/new" class="btn">
-								Create a post
-							</a>
-						</div>
-					</div>
+	<section class="school-facts" aria-label="Informații despre liceu">
+		<div class="frame school-facts__grid">
+			<div><strong>Din 1961</strong><span>educație în comunitatea clujeană</span></div>
+			<div><strong>Curiozitate</strong><span>învățare pentru lumea de mâine</span></div>
+			<div><strong>Comunitate</strong><span>elevi, profesori și familii</span></div>
+			<div><strong>Cluj-Napoca</strong><span>Strada Alexandru Vlahuță nr. 12</span></div>
+		</div>
+	</section>
+
+	<section class="band section" id="anunturi" aria-labelledby="news-title">
+		<div class="frame">
+			<div class="section-head school-section-head">
+				<div>
+					<p class="eyebrow">Noutăți</p>
+					<h2 id="news-title" class="section-head__title">Anunțuri pentru comunitatea noastră</h2>
 				</div>
-			</section>
-		) : (
-			<>
-				{featuredPost && (
-					<section class="band section">
-						<div class="frame">
-							<PostCard
-								post={featuredPost}
-								tags={featuredTags}
-								variant="feature"
-								headingLevel={2}
-								priority
-							/>
-						</div>
-					</section>
-				)}
-
-				{gridPostsWithTags.length > 0 && (
-					<section class="band section" aria-labelledby="latest-posts">
-						<div class="frame">
-							<div class="section-head">
-								<h2 id="latest-posts" class="section-head__title">
-									Latest posts
-								</h2>
-								{hasMorePosts && (
-									<a href="/posts" class="arrow-link">
-										View all<span class="sr-only"> posts</span>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="1.75"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											aria-hidden="true"
-										>
-											<path d="M5 12h14" />
-											<path d="m12 5 7 7-7 7" />
-										</svg>
-									</a>
+				<a href="/noutati" class="arrow-link">Toate anunțurile <span aria-hidden="true">→</span></a>
+			</div>
+			{announcements.length ? (
+				<div class="school-news-grid">
+					{announcements.slice(0, 4).map((announcement) => (
+						<article class="school-news-card">
+							{announcement.data.featured_image_url && (
+								<a href={`/noutati/${announcement.id}`} class="school-news-card__image">
+									<img src={announcement.data.featured_image_url} alt="" loading="lazy" />
+								</a>
+							)}
+							<div class="school-news-card__body">
+								{announcement.data.source_date && (
+									<time class="eyebrow" datetime={new Date(announcement.data.source_date).toISOString()}>
+										{formatDate(new Date(announcement.data.source_date), "short")}
+									</time>
 								)}
+								<h3><a href={`/noutati/${announcement.id}`}>{announcement.data.title}</a></h3>
+								{announcement.data.excerpt && <p>{announcement.data.excerpt}</p>}
+								<a class="text-link" href={`/noutati/${announcement.id}`}>Citește anunțul <span aria-hidden="true">→</span></a>
 							</div>
-							<div class="post-grid">
-								{gridPostsWithTags.map(({ post, tags }) => (
-									<PostCard
-										post={post}
-										tags={tags}
-										variant="card"
-										headingLevel={3}
-									/>
-								))}
-							</div>
-						</div>
-					</section>
+						</article>
+					))}
+				</div>
+			) : (
+				<p class="school-empty">Anunțurile vor fi publicate aici.</p>
+			)}
+		</div>
+	</section>
+
+	<section class="band section school-about" aria-labelledby="about-title">
+		<div class="frame school-about__grid">
+			<div>
+				<p class="eyebrow">Despre noi</p>
+				<h2 id="about-title">Un liceu cu rădăcini puternice și privirea spre viitor</h2>
+				<p>
+					În 1961, în vechiul cartier Donath, au fost construite primele instituții
+					de învățământ. De atunci, generații de elevi au crescut și au învățat
+					împreună, iar liceul a devenit parte din istoria comunității clujene.
+				</p>
+				<p>
+					Astăzi, Liceul Teoretic „Onisifor Ghibu” îmbină experiența cu ideile
+					noi și îi încurajează pe elevi să descopere ce pot deveni.
+				</p>
+				<a href="/despre-noi" class="btn btn--ghost">Povestea liceului</a>
+			</div>
+			<div class="school-about__panel">
+				<p class="eyebrow">Misiunea noastră</p>
+				<blockquote>
+					„Educăm tinerele generații și îi inspirăm pe elevi să devină liderii de mâine.”
+				</blockquote>
+				<div class="school-about__links">
+					<a href="/profesori">Cunoaște profesorii <span aria-hidden="true">→</span></a>
+					<a href="/elevi">Viața de elev <span aria-hidden="true">→</span></a>
+					<a href="/proiecte">Proiecte și activități <span aria-hidden="true">→</span></a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="band section" aria-labelledby="programs-title">
+		<div class="frame">
+			<div class="section-head school-section-head">
+				<div>
+					<p class="eyebrow">Învățare și implicare</p>
+					<h2 id="programs-title" class="section-head__title">O școală în care se întâmplă lucruri</h2>
+				</div>
+				<a href="/proiecte" class="arrow-link">Vezi activitățile <span aria-hidden="true">→</span></a>
+			</div>
+			<div class="school-program-grid">
+				{courses.map((course) => (
+					<a class="school-program-card" href={`/programe/${course.id}`}>
+						<span class="school-program-card__mark" aria-hidden="true">✦</span>
+						<h3>{course.data.title}</h3>
+						<p>{course.data.excerpt || "Descoperă programul și oportunitățile de învățare."}</p>
+						<span class="text-link">Află mai multe <span aria-hidden="true">→</span></span>
+					</a>
+				))}
+				{events.slice(0, 2).map((event) => (
+					<a class="school-program-card school-program-card--event" href={`/evenimente/${event.id}`}>
+						<span class="school-program-card__mark" aria-hidden="true">◷</span>
+						<h3>{event.data.title}</h3>
+						<p>{event.data.excerpt || "Evenimente care aduc împreună comunitatea liceului."}</p>
+						<span class="text-link">Detalii eveniment <span aria-hidden="true">→</span></span>
+					</a>
+				))}
+				{courses.length === 0 && events.length === 0 && (
+					<a class="school-program-card" href="/noutati">
+						<span class="school-program-card__mark" aria-hidden="true">✦</span>
+						<h3>Activitățile liceului</h3>
+						<p>Urmărește anunțurile și proiectele comunității noastre.</p>
+						<span class="text-link">Vezi noutățile <span aria-hidden="true">→</span></span>
+					</a>
 				)}
-			</>
-		)
-	}
+			</div>
+		</div>
+	</section>
+
+	<section class="school-contact-cta">
+		<div class="frame school-contact-cta__inner">
+			<div>
+				<p class="eyebrow">Hai să vorbim</p>
+				<h2>Ai o întrebare pentru liceu?</h2>
+				<p>Secretariatul îți stă la dispoziție pentru informații și îndrumare.</p>
+			</div>
+			<a href="/contact" class="btn">Contactează-ne</a>
+		</div>
+	</section>
 </Base>
 
 <style>
-	.home-intro {
+	.school-hero {
+		position: relative;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		min-height: clamp(32rem, 66vw, 43rem);
+		align-items: center;
+		overflow: hidden;
+		background: #233a2a;
+		color: #fff;
+	}
+
+	.school-hero__image,
+	.school-hero__shade {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.school-hero__image {
+		object-fit: cover;
+		object-position: center 45%;
+	}
+
+	.school-hero__shade {
+		background:
+			linear-gradient(90deg, rgb(13 34 21 / 88%), rgb(18 43 26 / 54%) 55%, rgb(18 43 26 / 16%)),
+			linear-gradient(0deg, rgb(12 30 18 / 25%), transparent 45%);
+	}
+
+	.school-hero__content {
+		position: relative;
+		z-index: 1;
+		padding-block: 5rem 7rem;
+		border-inline: 0;
+	}
+
+	.school-hero__eyebrow {
+		margin-bottom: 1rem;
+		color: #d7ead2;
+		font-size: var(--font-size-sm);
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.school-hero h1 {
+		max-width: 13ch;
+		color: #fff;
+		font-size: clamp(2.6rem, 7vw, 5.5rem);
+		line-height: 0.98;
+		letter-spacing: -0.055em;
+		text-wrap: balance;
+	}
+
+	.school-hero__content > p:not(.school-hero__eyebrow) {
+		max-width: 48ch;
+		margin-top: 1.4rem;
+		color: rgb(255 255 255 / 88%);
+		font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+		line-height: 1.65;
+	}
+
+	.school-hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+
+	.school-hero .btn--light {
+		border-color: rgb(255 255 255 / 70%);
+		background: rgb(255 255 255 / 10%);
+		color: #fff;
+	}
+
+	.school-hero .btn--light:hover {
+		background: rgb(255 255 255 / 22%);
+	}
+
+	.school-hero__scroll {
+		position: absolute;
+		z-index: 1;
+		inset-inline-end: max(1.5rem, calc((100% - var(--wide-width)) / 2));
+		bottom: 1.75rem;
+		color: #fff;
+		font-size: var(--font-size-sm);
+		text-decoration: none;
+	}
+
+	.school-hero__scroll span {
+		margin-inline-start: 0.5rem;
+	}
+
+	.school-facts {
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+	}
+
+	.school-facts__grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		padding-block: 1.4rem;
+		border-inline: 0;
+	}
+
+	.school-facts__grid > div {
+		display: grid;
+		gap: 0.3rem;
+		padding: 0.35rem 1.25rem;
+		border-inline-start: 1px solid color-mix(in srgb, var(--color-on-brand) 22%, transparent);
+	}
+
+	.school-facts__grid > div:first-child {
+		border-inline-start: 0;
+	}
+
+	.school-facts strong {
+		font-size: 1.05rem;
+	}
+
+	.school-facts span {
+		color: color-mix(in srgb, var(--color-on-brand) 78%, transparent);
+		font-size: var(--font-size-xs);
+	}
+
+	.school-section-head {
 		align-items: end;
-		gap: var(--spacing-6) var(--spacing-8);
 	}
 
-	/* Lifts the pill from the line box's bottom onto the last line's baseline */
-	.home-intro__rss {
-		margin-block-end: var(--spacing-2);
+	.school-section-head .eyebrow {
+		margin-bottom: 0.3rem;
 	}
 
-	@media (max-width: 720px) {
-		.home-intro {
-			grid-template-columns: minmax(0, 1fr);
+	.school-news-grid,
+	.school-program-grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 1.25rem;
+	}
+
+	.school-news-card,
+	.school-program-card {
+		min-width: 0;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		background: var(--color-surface);
+		box-shadow: var(--shadow-card);
+	}
+
+	.school-news-card__image {
+		display: block;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		background: var(--color-fill);
+	}
+
+	.school-news-card__image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 250ms ease;
+	}
+
+	.school-news-card:hover .school-news-card__image img {
+		transform: scale(1.03);
+	}
+
+	.school-news-card__body {
+		display: flex;
+		min-height: 15rem;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 1.2rem;
+	}
+
+	.school-news-card__body h3 {
+		margin-top: 0.75rem;
+		font-size: 1.12rem;
+		line-height: 1.35;
+	}
+
+	.school-news-card__body h3 a {
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.school-news-card__body > p {
+		display: -webkit-box;
+		margin-top: 0.6rem;
+		overflow: hidden;
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+	}
+
+	.text-link {
+		display: inline-flex;
+		gap: 0.4rem;
+		align-items: center;
+		margin-top: auto;
+		padding-top: 1rem;
+		color: var(--color-brand);
+		font-size: var(--font-size-sm);
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.school-about {
+		background: var(--color-fill);
+	}
+
+	.school-about__grid {
+		display: grid;
+		grid-template-columns: 1.1fr 0.9fr;
+		align-items: center;
+		gap: clamp(2rem, 6vw, 6rem);
+		border-inline: 0;
+	}
+
+	.school-about__grid h2 {
+		max-width: 18ch;
+		margin-block: 0.4rem 1rem;
+		font-size: clamp(2rem, 3.8vw, 3.25rem);
+		line-height: 1.08;
+		letter-spacing: -0.04em;
+	}
+
+	.school-about__grid > div:first-child > p:not(.eyebrow) {
+		max-width: 66ch;
+		margin-bottom: 0.8rem;
+		color: var(--color-text-secondary);
+		line-height: 1.75;
+	}
+
+	.school-about__grid .btn {
+		margin-top: 0.75rem;
+	}
+
+	.school-about__panel {
+		padding: clamp(1.5rem, 4vw, 2.5rem);
+		border-radius: var(--radius-xl);
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+		box-shadow: var(--shadow-card);
+	}
+
+	.school-about__panel .eyebrow {
+		color: color-mix(in srgb, var(--color-on-brand) 78%, transparent);
+	}
+
+	.school-about__panel blockquote {
+		margin-block: 1rem 1.6rem;
+		font-size: clamp(1.4rem, 2.4vw, 2rem);
+		font-weight: 650;
+		line-height: 1.35;
+	}
+
+	.school-about__links {
+		display: grid;
+		gap: 0.1rem;
+	}
+
+	.school-about__links a {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-block: 0.85rem;
+		border-top: 1px solid color-mix(in srgb, var(--color-on-brand) 22%, transparent);
+		color: var(--color-on-brand);
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.school-program-card {
+		display: flex;
+		min-height: 17rem;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 1.4rem;
+		color: var(--color-text);
+		text-decoration: none;
+		transition: transform 180ms ease, box-shadow 180ms ease;
+	}
+
+	.school-program-card:hover {
+		transform: translateY(-3px);
+		box-shadow: var(--shadow-card-hover);
+	}
+
+	.school-program-card__mark {
+		display: grid;
+		width: 2.6rem;
+		height: 2.6rem;
+		place-items: center;
+		border-radius: 50%;
+		background: var(--color-fill);
+		color: var(--color-brand);
+		font-size: 1.2rem;
+	}
+
+	.school-program-card h3 {
+		margin-top: 1.2rem;
+		font-size: 1.15rem;
+		line-height: 1.3;
+	}
+
+	.school-program-card p {
+		margin-top: 0.5rem;
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+		line-height: 1.6;
+	}
+
+	.school-contact-cta {
+		padding-block: clamp(2.5rem, 6vw, 4.5rem);
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+	}
+
+	.school-contact-cta__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 2rem;
+		border-inline: 0;
+	}
+
+	.school-contact-cta h2 {
+		margin-block: 0.3rem 0.55rem;
+		font-size: clamp(1.8rem, 4vw, 2.7rem);
+	}
+
+	.school-contact-cta p:last-child {
+		color: color-mix(in srgb, var(--color-on-brand) 80%, transparent);
+	}
+
+	.school-contact-cta h2 {
+		color: var(--color-on-brand);
+	}
+
+	.school-contact-cta .btn {
+		border-color: var(--color-on-brand);
+		background: var(--color-on-brand);
+		color: var(--color-brand);
+	}
+
+	.school-empty {
+		padding: 1.5rem;
+		border: 1px dashed var(--color-border-strong);
+		border-radius: var(--radius-lg);
+		color: var(--color-text-secondary);
+	}
+
+	@media (max-width: 950px) {
+		.school-news-grid,
+		.school-program-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
-		.home-intro__rss {
-			justify-self: start;
-			margin-block-end: 0;
+		.school-facts__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.5rem 0;
+		}
+
+		.school-facts__grid > div:nth-child(3) {
+			border-inline-start: 0;
+		}
+	}
+
+	@media (max-width: 680px) {
+		.school-hero {
+			min-height: 36rem;
+		}
+
+		.school-hero__shade {
+			background: linear-gradient(90deg, rgb(13 34 21 / 88%), rgb(18 43 26 / 45%));
+		}
+
+		.school-hero__content {
+			padding-block: 4rem 6rem;
+		}
+
+		.school-facts__grid > div {
+			padding-inline: 0.75rem;
+		}
+
+		.school-about__grid {
+			grid-template-columns: 1fr;
+		}
+
+		.school-contact-cta__inner {
+			align-items: flex-start;
+			flex-direction: column;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.school-news-grid,
+		.school-program-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.school-facts__grid {
+			grid-template-columns: 1fr;
+		}
+
+		.school-facts__grid > div,
+		.school-facts__grid > div:nth-child(3) {
+			border-inline-start: 0;
+			border-top: 1px solid color-mix(in srgb, var(--color-on-brand) 22%, transparent);
+		}
+
+		.school-facts__grid > div:first-child {
+			border-top: 0;
+		}
+
+		.school-hero__scroll {
+			display: none;
 		}
 	}
 </style>

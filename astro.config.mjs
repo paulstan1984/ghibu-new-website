@@ -4,11 +4,20 @@ import { defineConfig, fontProviders } from "astro/config";
 import emdash, { local } from "emdash/astro";
 import { sqlite } from "emdash/db";
 
+const databasePath = process.env.DATABASE_PATH || "./data.db";
+const mediaDirectory = process.env.MEDIA_DIRECTORY || "./uploads";
+
 export default defineConfig({
+	site: "https://www.liceul-onisifor-ghibu.ro",
 	output: "server",
 	adapter: node({
 		mode: "standalone",
 	}),
+	i18n: {
+		defaultLocale: "ro",
+		locales: ["ro"],
+		routing: { prefixDefaultLocale: false },
+	},
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,
@@ -16,9 +25,9 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
-			database: sqlite({ url: "file:./data.db" }),
+			database: sqlite({ url: `file:${databasePath}` }),
 			storage: local({
-				directory: "./uploads",
+				directory: mediaDirectory,
 				baseUrl: "/_emdash/api/media/file",
 			}),
 		}),

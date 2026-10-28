@@ -1,0 +1,118 @@
+---
+import { getEmDashEntry } from "emdash";
+import { PortableText } from "emdash/ui";
+import Base from "../layouts/Base.astro";
+import SchoolForm from "../components/SchoolForm.astro";
+import WordPressImage from "../components/WordPressImage.astro";
+
+const { entry: page, error, cacheHint } = await getEmDashEntry("pages", "contact");
+if (error) return new Response("Nu am putut încărca pagina de contact.", { status: 500 });
+if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
+---
+
+<Base
+	title="Contact"
+	description="Date de contact, programul secretariatului și formularul Liceului Teoretic „Onisifor Ghibu”."
+	content={page ? { collection: "pages", id: page.data.id, slug: page.id } : undefined}
+>
+	<header class="band intro">
+		<div class="frame school-page-intro">
+			<p class="eyebrow">Suntem aici să te ajutăm</p>
+			<h1 class="intro__title">Contact</h1>
+			<p class="intro__lead">Ia legătura cu secretariatul sau trimite-ne un mesaj.</p>
+		</div>
+	</header>
+	<section class="band section">
+		<div class="frame school-contact-layout">
+			<div class="school-contact-details">
+				<div>
+					<p class="eyebrow">Adresa</p>
+					<h2>Liceul Teoretic „Onisifor Ghibu”</h2>
+					<p>Strada Alexandru Vlahuță nr. 12<br />Cluj-Napoca, România</p>
+					<a class="text-link" href="https://maps.google.com/?q=Strada+Alexandru+Vlahuta+12+Cluj-Napoca" target="_blank" rel="noopener noreferrer">
+						Deschide harta <span aria-hidden="true">↗</span>
+					</a>
+				</div>
+				<div>
+					<p class="eyebrow">Telefon</p>
+					<p><a href="tel:+40264580615">Secretariat: 0264 580 615</a></p>
+					<p><a href="tel:+40264587298">Contabilitate: 0264 587 298</a></p>
+					<p><a href="tel:+40264585965">Direcțiune: 0264 585 965</a></p>
+				</div>
+				<div>
+					<p class="eyebrow">E-mail</p>
+					<p><a href="mailto:office@liceul-onisifor-ghibu.ro">office@liceul-onisifor-ghibu.ro</a></p>
+				</div>
+				<div>
+					<p class="eyebrow">Program cu publicul</p>
+					<p>Luni, marți, vineri: 11:00–13:00</p>
+					<p>Miercuri, joi: 08:00–09:00 și 16:00–18:00</p>
+				</div>
+				{page?.data.content?.length ? (
+					<div class="school-contact-source prose">
+						<PortableText
+							value={page.data.content}
+							components={{ type: { wordpressImage: WordPressImage } }}
+						/>
+					</div>
+				) : null}
+			</div>
+			<SchoolForm variant="contact" />
+		</div>
+	</section>
+</Base>
+
+<style>
+	.school-contact-layout {
+		display: grid;
+		grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
+		align-items: start;
+		gap: clamp(1.5rem, 4vw, 3.5rem);
+	}
+
+	.school-contact-details {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.school-contact-details > div {
+		padding: 1.25rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface);
+	}
+
+	.school-contact-details h2 {
+		margin-block: 0.3rem 0.65rem;
+		font-size: 1.3rem;
+	}
+
+	.school-contact-details p {
+		color: var(--color-text-secondary);
+		line-height: 1.65;
+	}
+
+	.school-contact-details a:not(.text-link) {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.school-contact-details a:not(.text-link):hover {
+		color: var(--color-brand);
+		text-decoration: underline;
+	}
+
+	.school-contact-details .text-link {
+		margin-top: 0.6rem;
+	}
+
+	.school-contact-source {
+		font-size: var(--font-size-sm);
+	}
+
+	@media (max-width: 850px) {
+		.school-contact-layout {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
