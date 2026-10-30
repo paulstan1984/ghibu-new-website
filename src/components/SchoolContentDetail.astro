@@ -4,7 +4,10 @@ import { PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
 import SchoolForm from "./SchoolForm.astro";
 import WordPressImage from "./WordPressImage.astro";
+import WordPressLink from "./WordPressLink.astro";
+import WordPressMedia from "./WordPressMedia.astro";
 import { formatDate } from "../utils/locale";
+import { normalizeWordPressMarkDefinitions } from "../utils/wordpress-media";
 
 interface Props {
 	collection: string;
@@ -72,8 +75,11 @@ const canonicalCollection = collection;
 			{entry.data.excerpt && <p class="school-entry__excerpt">{entry.data.excerpt}</p>}
 			<div class="prose school-entry__content">
 				<PortableText
-					value={entry.data.content ?? []}
-					components={{ type: { wordpressImage: WordPressImage } }}
+					value={normalizeWordPressMarkDefinitions(entry.data.content ?? [])}
+					components={{
+						type: { wordpressImage: WordPressImage, wordpressMedia: WordPressMedia },
+						mark: { link: WordPressLink },
+					}}
 				/>
 			</div>
 			{formKind && <SchoolForm variant={formKind} />}

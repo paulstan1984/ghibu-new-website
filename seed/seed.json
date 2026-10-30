@@ -4425,17 +4425,11 @@
               ]
             },
             {
-              "_type": "block",
-              "_key": "block-0216",
-              "style": "normal",
-              "children": [
-                {
-                  "_type": "span",
-                  "_key": "span-0218",
-                  "text": "\nhttps://www.youtube.com/watch?v=13a0XM3_AS8&ab_channel=TheMovielizer\n",
-                  "marks": []
-                }
-              ]
+              "_type": "wordpressMedia",
+              "_key": "media-activitati-targ-craciun",
+              "kind": "iframe",
+              "src": "https://www.youtube.com/embed/13a0XM3_AS8",
+              "title": "Târgul de Crăciun al liceului"
             },
             {
               "_type": "block",
@@ -4464,17 +4458,11 @@
               ]
             },
             {
-              "_type": "block",
-              "_key": "block-0228",
-              "style": "normal",
-              "children": [
-                {
-                  "_type": "span",
-                  "_key": "span-0231",
-                  "text": "\nhttps://youtu.be/3yGTPEjYaxc\n",
-                  "marks": []
-                }
-              ]
+              "_type": "wordpressMedia",
+              "_key": "media-activitati-ziua-nationala",
+              "kind": "iframe",
+              "src": "https://www.youtube.com/embed/3yGTPEjYaxc",
+              "title": "1 Decembrie la liceu"
             },
             {
               "_type": "block",
@@ -7675,6 +7663,13 @@
                   "marks": []
                 }
               ]
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-cambridge-simulare",
+              "kind": "iframe",
+              "src": "/wp-content/uploads/2026/05/Anunt_Simulare_Cambridge-16-mai.pdf",
+              "title": "Anunț simulare Cambridge"
             }
           ],
           "featured_image_url": "",
@@ -7705,6 +7700,30 @@
                   "marks": []
                 }
               ]
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-erasmus-acreditare",
+              "kind": "iframe",
+              "src": "/wp-content/uploads/2026/05/Anunt_Acreditare_Erasmus_Onisifor_Ghibu.pdf"
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-erasmus-mobilitati",
+              "kind": "iframe",
+              "src": "/wp-content/uploads/2026/10/Prezentare-mobilitati-2026-2027.pdf"
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-erasmus-prezentare",
+              "kind": "iframe",
+              "src": "/wp-content/uploads/2026/05/Prezentare-Acreditare-Erasmus_Ghibu.pdf"
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-erasmus-strategie",
+              "kind": "iframe",
+              "src": "/wp-content/uploads/2026/05/Strategie-de-internationalizare_Ghibu.pdf"
             }
           ],
           "featured_image_url": "",
@@ -7722,7 +7741,15 @@
         "data": {
           "title": "Biblio Fm Prezentare",
           "excerpt": "",
-          "content": [],
+          "content": [
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-biblio-fm-video",
+              "kind": "video",
+              "src": "/wp-content/uploads/2026/10/ce-este-biblio-fm.mp4",
+              "title": "Ce este Biblio FM"
+            }
+          ],
           "featured_image_url": "",
           "source_url": "https://www.liceul-onisifor-ghibu.ro/biblio-fm/",
           "source_id": "2867",
@@ -7776,6 +7803,13 @@
               ]
             },
             {
+              "_type": "wordpressMedia",
+              "_key": "media-biblio-fm-editia-3",
+              "kind": "audio",
+              "src": "/wp-content/uploads/2026/10/Editia-3.mp3",
+              "title": "Ediția 3 - Cum ne ajută inteligența artificială?"
+            },
+            {
               "_type": "block",
               "_key": "block-0017",
               "style": "h2",
@@ -7789,6 +7823,13 @@
               ]
             },
             {
+              "_type": "wordpressMedia",
+              "_key": "media-biblio-fm-editia-2",
+              "kind": "audio",
+              "src": "/wp-content/uploads/2026/10/Editia-2.mp3",
+              "title": "Ediția 2 - Biblio FM pe ritmuri de muzică rock"
+            },
+            {
               "_type": "block",
               "_key": "block-0029",
               "style": "h2",
@@ -7800,6 +7841,13 @@
                   "marks": []
                 }
               ]
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-biblio-fm-editia-1",
+              "kind": "audio",
+              "src": "/wp-content/uploads/2026/10/Editia-1-Biblio-Fm-porneste-la-drum.mp3",
+              "title": "Ediția 1 - Prezentare Biblio FM"
             }
           ],
           "featured_image_url": "",
@@ -7840,6 +7888,13 @@
                   "href": "https://www.liceul-onisifor-ghibu.ro/wp-content/uploads/2026/10/Acord-GDPR.pdf"
                 }
               }
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-biblio-fm-acord-gdpr",
+              "kind": "audio",
+              "src": "/wp-content/uploads/2026/10/Editia-1-Biblio-Fm-porneste-la-drum.mp3",
+              "title": "Biblio FM - Ediția 1"
             }
           ],
           "featured_image_url": "",
@@ -13508,29 +13563,18 @@
               ]
             },
             {
-              "_type": "block",
-              "_key": "block-1071",
-              "style": "normal",
-              "children": [
-                {
-                  "_type": "span",
-                  "_key": "span-1073",
-                  "text": "\nhttps://www.youtube.com/watch?v=UuSj47_0Aa4&ab_channel=LazarSimona\n",
-                  "marks": []
-                },
-                {
-                  "_type": "span",
-                  "_key": "span-1074",
-                  "text": "\n\n\n\n",
-                  "marks": []
-                },
-                {
-                  "_type": "span",
-                  "_key": "span-1075",
-                  "text": "\nhttps://youtu.be/VmIDkekEQ34\n",
-                  "marks": []
-                }
-              ]
+              "_type": "wordpressMedia",
+              "_key": "media-noutati-ziua-culturii",
+              "kind": "iframe",
+              "src": "https://www.youtube.com/embed/UuSj47_0Aa4",
+              "title": "Ziua Culturii Naționale"
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-noutati-ziua-culturii-2",
+              "kind": "iframe",
+              "src": "https://www.youtube.com/embed/VmIDkekEQ34",
+              "title": "15 ianuarie - Ziua Culturii Naționale"
             },
             {
               "_type": "block",
@@ -13700,6 +13744,18 @@
                   "marks": []
                 }
               ]
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-noutati-video-2024-1",
+              "kind": "video",
+              "src": "/wp-content/uploads/2022/01/WhatsApp-Video-2024-11-29-at-20.40.23_9046cff4.mp4"
+            },
+            {
+              "_type": "wordpressMedia",
+              "_key": "media-noutati-video-2024-2",
+              "kind": "video",
+              "src": "/wp-content/uploads/2024/03/GEl71hm-L7f-1RMBAGoZz4BIH90PbmdjAAAF.mp4"
             }
           ],
           "featured_image_url": "",
