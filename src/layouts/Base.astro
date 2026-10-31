@@ -6,6 +6,7 @@ import {
 	EmDashBodyStart,
 	EmDashBodyEnd,
 } from "emdash/ui";
+import MenuItem from "../components/MenuItem.astro";
 import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
 import { Font } from "astro:assets";
@@ -79,9 +80,6 @@ const pageCtx = createPublicPageContext({
 	articleMeta: { publishedTime, modifiedTime, author },
 	siteName: siteTitle,
 });
-
-// Check if user is logged in (for showing admin link)
-const isLoggedIn = !!Astro.locals.user;
 
 const TRAILING_SLASH = /\/$/;
 const currentPath = Astro.url.pathname.replace(TRAILING_SLASH, "") || "/";
@@ -175,22 +173,9 @@ const year = new Date().getFullYear();
 				{
 					menuItems.length > 0 && (
 						<nav class="site-nav" aria-label="Meniul principal">
-							<ul>
+							<ul class="site-nav__list">
 								{menuItems.map((item) => (
-									<li>
-										<a
-											href={item.url}
-											target={item.target}
-											rel={
-												item.target === "_blank"
-													? "noopener noreferrer"
-													: undefined
-											}
-											aria-current={navCurrent(item.url)}
-										>
-											{item.label}
-										</a>
-									</li>
+									<MenuItem item={item} navCurrent={navCurrent} />
 								))}
 							</ul>
 						</nav>
@@ -239,13 +224,6 @@ const year = new Date().getFullYear();
 							></path></svg
 						>
 					</a>
-					{
-						isLoggedIn && (
-							<a href="/_emdash/admin" class="btn btn--ghost btn--sm nav-admin">
-								Admin
-							</a>
-						)
-					}
 				</div>
 			</div>
 		</header>
@@ -1086,9 +1064,11 @@ const year = new Date().getFullYear();
 			}
 
 			/* Long menus wrap rather than push the page wider than the viewport */
-			.site-nav ul {
+			.site-nav__list {
 				display: flex;
 				flex-wrap: wrap;
+				margin: 0;
+				padding: 0;
 				gap: 2px;
 				list-style: none;
 			}

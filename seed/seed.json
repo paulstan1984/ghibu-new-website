@@ -434,33 +434,560 @@
         },
         {
           "type": "custom",
-          "label": "Despre liceu",
-          "url": "/despre-noi"
+          "label": "Anunțuri",
+          "url": "/noutati/",
+          "children": [
+            {
+              "type": "custom",
+              "label": "Cambridge",
+              "url": "/cambridge/"
+            },
+            {
+              "type": "custom",
+              "label": "Erasmus+",
+              "url": "/erasmus/"
+            },
+            {
+              "type": "custom",
+              "label": "Anunț Secretariat",
+              "url": "/wp-content/uploads/2026/04/ANUNT-IMPORTANT-SECRETARIAT-2.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "Cabinet Stomatologic",
+              "url": "/wp-content/uploads/2025/09/ANUNT-CABINET-STOMATOLOGIC.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "Legislație EGALITATE DE ȘANSE, DISCRIMINARE, HĂRȚUIRE",
+              "url": "/legislatie-discriminare/"
+            }
+          ]
         },
         {
           "type": "custom",
-          "label": "Anunțuri",
-          "url": "/noutati"
+          "label": "DOCUMENTE",
+          "url": "/category/fara-categorie/",
+          "children": [
+            {
+              "type": "custom",
+              "label": "ELEVI",
+              "url": "/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Cerere de învoire elevi",
+                  "url": "/wp-content/uploads/2024/10/Cerere-de-invoire-elevi._2024-2025.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Cerere și Declarație pentru neparticiparea elevului la ora de Religie",
+                  "url": "/wp-content/uploads/2023/09/Cerere-si-declaratie-pentru-neparticiparea-elevului-la-ora-de-religie.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Burse",
+                  "url": "/burse"
+                },
+                {
+                  "type": "custom",
+                  "label": "Accesul elevilor",
+                  "url": "/wp-content/uploads/2025/09/ACCESUL-ELEVILOR-SI-A-PERSONALULUI-IN-INCINTA-UNITATII-SCOLARE-2025-2026.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Procedura Transfer Intern din invatamantul primar si gimnazial",
+                  "url": "/wp-content/uploads/2026/10/Procedura-transfer-intern-din-invatamantul-primar-si-gimnazial.pdf"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "ADMINISTRATIVE",
+              "url": "/category/fara-categorie/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "PDI 2025-2029",
+                  "url": "/wp-content/uploads/2026/08/PDI-2025-2029_-Liceul-Teoretic-Onisifor-Ghibu.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Planuri manageriale",
+                  "url": "/wp-content/uploads/2025/11/Planuri-manageriale-DIRECTORI.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Organigrama",
+                  "url": "/wp-content/uploads/2026/10/Organigrama-Liceului-Teoretic-%E2%80%9EOnisifor-Ghibu-2026-2027.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "RAEI",
+                  "url": "/wp-content/uploads/2026/10/RAEI-an-scolar-2025-2026.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Raport analiză",
+                  "url": "/wp-content/uploads/2026/10/Raport-de-activitate-pentru-anul-colar-2025-2026.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Oferta educațională",
+                  "url": "/wp-content/uploads/2023/10/oferta-educationala-2020-2024.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Regulament",
+                  "url": "/wp-content/uploads/2026/10/Regulament-de-organizare-si-functionare-a-Liceului-Teoretic-%E2%80%9EOnisifor-Ghibu-Cluj-Napoca.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Sancțiuni (Anexa 7)",
+                  "url": "/wp-content/uploads/2026/10/Anexa-7-la-Regulamentul-de-organizare-si-functionare-a-Liceului-Teoretic-%E2%80%9EOnisifor-Ghibu-2026-2027.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "GDPR",
+                  "url": "/wp-content/uploads/2023/09/ANUNT-GDPR.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Procedura de access in unitate",
+                  "url": "/wp-content/uploads/2026/10/procedura-de-acces-in-unitate-2026-2027.pdf"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "Orar ȘCOALA ALTFEL",
+              "url": "/wp-content/uploads/2025/11/Orar-scoala-altfel-2025-2026.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "Regulament Biblioteca",
+              "url": "/wp-content/uploads/2024/10/Regulament-biblioteca.pdf"
+            }
+          ]
         },
         {
           "type": "custom",
           "label": "Profesori",
-          "url": "/profesori"
+          "url": "#",
+          "children": [
+            {
+              "type": "custom",
+              "label": "Orar general profesori",
+              "url": "/wp-content/uploads/2025/09/Orar-general-profesori-8.09.2025-1.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "ACTIVITĂȚI",
+              "url": "/activitati/"
+            },
+            {
+              "type": "custom",
+              "label": "Profesori 2025-2026",
+              "url": "/profesori-2023-2024/"
+            }
+          ]
         },
         {
           "type": "custom",
           "label": "Elevi",
-          "url": "/elevi"
+          "url": "#",
+          "children": [
+            {
+              "type": "custom",
+              "label": "Anunt vizualizare contestatii lucrari Cls 8 – 2026",
+              "url": "/wp-content/uploads/2026/07/Anunt-vizualizare-contestatii-lucrari-cls-8_2026.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "Examene CAMBRIDGE",
+              "url": "/examene-cambridge/"
+            },
+            {
+              "type": "custom",
+              "label": "REPARTIȚIE CLASE",
+              "url": "/wp-content/uploads/2025/09/Repartitie-sali-de-clasa.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "Orar general clase",
+              "url": "/wp-content/uploads/2026/10/Orar-general-clase-2026-2027.pdf"
+            },
+            {
+              "type": "custom",
+              "label": "Biblioteca",
+              "url": "/"
+            },
+            {
+              "type": "custom",
+              "label": "Elevii de top / Rezultate olimpiade",
+              "url": "/elevii-de-top-rezultate-olimpiade/"
+            },
+            {
+              "type": "custom",
+              "label": "Revista LOGO",
+              "url": "/revista-logo/"
+            },
+            {
+              "type": "custom",
+              "label": "PRIMAR / GIMNAZIU",
+              "url": "/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Transfer gimnaziu",
+                  "url": "/transfer-clasele-p-viii/"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "LICEU",
+              "url": "/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Transfer liceu",
+                  "url": "/transfer-liceu/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Șefi de promoție LICEU",
+                  "url": "/sefi-de-promotie/"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "custom",
           "label": "Proiecte",
-          "url": "/proiecte"
+          "url": "/proiecte/",
+          "children": [
+            {
+              "type": "custom",
+              "label": "PNRR",
+              "url": "/pnnr/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Invitații participare servicii",
+                  "url": "/invitatii-participare-servicii/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Rezultate evaluare dosare",
+                  "url": "/rezultate/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Rezultat proba eliminatorie",
+                  "url": "/wp-content/uploads/2025/12/Rezultat_proba_eliminatorie_semn.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "ANUNȚ SELECȚIE EXPERȚI",
+                  "url": "/wp-content/uploads/2026/03/ANUNT-SELECTIE-EXPERT-LUNA-MARTIE-2026.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Declarație disponibilitate",
+                  "url": "/wp-content/uploads/2025/12/Declaratie_disponibilitate.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Cerere înscriere",
+                  "url": "/wp-content/uploads/2025/12/Cerere_-inscriere_concurs.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Declarație date personale",
+                  "url": "/wp-content/uploads/2025/12/Declaratie_date_personale.pdf"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "custom",
+          "label": "Biblio Fm",
+          "url": "/biblio-fm/",
+          "children": [
+            {
+              "type": "custom",
+              "label": "Prezentare",
+              "url": "/biblio-fm/"
+            },
+            {
+              "type": "custom",
+              "label": "Poze",
+              "url": "/biblio-fm-poze/"
+            },
+            {
+              "type": "custom",
+              "label": "Ediții",
+              "url": "/biblio-fm-editii/"
+            },
+            {
+              "type": "custom",
+              "label": "Acord GDPR",
+              "url": "/wp-content/uploads/2026/10/Acord-GDPR.pdf"
+            }
+          ]
+        },
+        {
+          "type": "custom",
+          "label": "Secția maghiară",
+          "url": "/sectia-maghiara/"
+        },
+        {
+          "type": "custom",
+          "label": "Arhivă",
+          "url": "#",
+          "children": [
+            {
+              "type": "custom",
+              "label": "2024-2025",
+              "url": "/wp-content/uploads/2024/11/Regulament_2024-2025-02.10.2024.pdf",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Transfer Clasele P – VIII",
+                  "url": "/transfer-clasele-p-viii/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Documente profesori",
+                  "url": "/documente-manageriale/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Redirectionare 3.5% catre Biblioteca Liceului",
+                  "url": "/wp-content/uploads/2024/05/Redirectionare-35-catre-biblioteca-scolara-Onisifor-Ghibu.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Înscriere liceu 2025-2026",
+                  "url": "/wp-content/uploads/2025/07/Inscriere-liceu-2025-2026.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "ÎNSCRIERI CLASA PREGĂTITOARE 2026-2027",
+                  "url": "/inscrieri-clasa-pregatitoare/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Corigențe 2024-2025",
+                  "url": "/wp-content/uploads/2025/06/perioada-corigente-site.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Regulament",
+                  "url": "/wp-content/uploads/2024/11/Regulament_2024-2025-02.10.2024.pdf"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "2023-2024",
+              "url": "/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Plan cadru și planificare Școala Altfel 2023-2024",
+                  "url": "/wp-content/uploads/2023/10/Plan-cadru-si-planificare-scoala-altfel-2023-2024-de-pus-pe-site.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Comunicat programul claselor dupa-masa",
+                  "url": "/wp-content/uploads/2024/06/Comunicat-referitor-la-programul-claselor-dupa-masa.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Organigramă",
+                  "url": "/wp-content/uploads/2023/10/Organigrama-Ghibu-2023-2024.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Documente",
+                  "url": "/documente-manageriale/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Plan Managerial",
+                  "url": "/wp-content/uploads/2023/10/Plan-Managerial-Ghibu1-2023-2024.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Pregatim Biblioteca",
+                  "url": "/wp-content/uploads/2024/01/PREGATIM-BIBLIOTECA-1.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Rezultate Edeleanu",
+                  "url": "/wp-content/uploads/2024/03/Rezultate-Edeleanu.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Formular 230",
+                  "url": "/wp-content/uploads/2024/05/230-GHIBU-2024.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Comunicat 15.05.2024",
+                  "url": "/wp-content/uploads/2024/05/Comunicat.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Comunicat 06.06.2024",
+                  "url": "/wp-content/uploads/2024/06/Comunicat.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Evaluarea Națională 2024",
+                  "url": "/evaluarea-nationala-2024/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Înscrieri clasa pregătitoate",
+                  "url": "/inscrieri-clasa-pregatitoare-2025-2026/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Anunț concurs Edeleanu",
+                  "url": "/wp-content/uploads/2025/02/Anunt-Edeleanu.docx"
+                },
+                {
+                  "type": "custom",
+                  "label": "Rezultatele concursului Edeleanu",
+                  "url": "/wp-content/uploads/2025/05/Rezultatele-concursului-L_Edeleanu.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Informații Olimpiada Locala de Limba Romana",
+                  "url": "/ollr-faza-locala-14-dec-2024/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Anunt vizualizare lucrari EN 8",
+                  "url": "/wp-content/uploads/2024/07/ANUNT-VIZUALIZARE-LUCRARI-EN8.docx"
+                },
+                {
+                  "type": "custom",
+                  "label": "Cerere vizualizare lucrari EN 8",
+                  "url": "/wp-content/uploads/2024/07/Cerere-vizualizare-lucrari.docx"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "2022-2023",
+              "url": "/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Anunț clasa a 3-a",
+                  "url": "/wp-content/uploads/2023/07/ANUNT-CLASA-A-3-A.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Altele",
+                  "url": "/2022-2/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Documente",
+                  "url": "/documente-manageriale/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Olimpiada județeană de Limba Engleză",
+                  "url": "/olimpiada-judeteana-de-limba-engleza/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Simulări județene",
+                  "url": "/wp-content/uploads/2023/01/ISJCJ-87_Simulari-judetene-EN_BAC-feb-2023.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Înscriere Liceu 2023-2024",
+                  "url": "/wp-content/uploads/2023/07/ACTE-NECESARE-SI-CERERE-INSCRIERE-LICEU-2023-2024.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Anunt-vizualizare-Bac",
+                  "url": "/wp-content/uploads/2023/07/anunt-vizualizare-Bac.docx"
+                },
+                {
+                  "type": "custom",
+                  "label": "Anunț Contestații BAC",
+                  "url": "/wp-content/uploads/2023/07/Anunt_contestatii-BAC-GHIBU-2-4.docx"
+                },
+                {
+                  "type": "custom",
+                  "label": "Procedura vizualizare Bac",
+                  "url": "/wp-content/uploads/2023/07/ME-DGIP-27431-PROCEDURA_VIZUALIZARE_BAC-1.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Cerere Candidati Vizualizare Bac Iulie 2023",
+                  "url": "/wp-content/uploads/2023/07/cerere-candidati_vizualizare-bac-iulie-2023_v2-1.docx"
+                },
+                {
+                  "type": "custom",
+                  "label": "BACALAUREAT 2023",
+                  "url": "/bacalaureat-2023/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Anunț vizualizare lucrări EN8",
+                  "url": "/wp-content/uploads/2023/07/Anunt-vizualizare-lucrari-EN8.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Model Cerere Contestație Evaluare Națională 2023",
+                  "url": "/wp-content/uploads/2023/06/Cerere-contestatie-EN8-2023.pdf"
+                },
+                {
+                  "type": "custom",
+                  "label": "Perioada Corigențe",
+                  "url": "/perioada-corigente/"
+                },
+                {
+                  "type": "custom",
+                  "label": "Anunț îngrijitoare",
+                  "url": "/wp-content/uploads/2022/12/Anunt-concurs-INGRIJITOARE.pdf"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "2020-2021",
+              "url": "/2021/",
+              "children": [
+                {
+                  "type": "custom",
+                  "label": "Profesori 2021-2022",
+                  "url": "/profesori/"
+                }
+              ]
+            },
+            {
+              "type": "custom",
+              "label": "2019-2020",
+              "url": "/2020-2/"
+            }
+          ]
         },
         {
           "type": "custom",
           "label": "Contact",
-          "url": "/contact"
+          "url": "/contact/"
         }
       ]
     }

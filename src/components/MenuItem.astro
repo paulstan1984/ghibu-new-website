@@ -1,0 +1,44 @@
+---
+interface MenuItemData {
+	label: string;
+	url: string;
+	target?: string;
+	titleAttr?: string;
+	children?: MenuItemData[];
+}
+
+interface Props {
+	item: MenuItemData;
+	navCurrent: (url: string) => "page" | "true" | undefined;
+}
+
+const { item, navCurrent } = Astro.props;
+const hasChildren = (item.children?.length ?? 0) > 0;
+---
+
+<li
+	class:list={[
+		"site-nav__item",
+		hasChildren && "site-nav__item--has-children",
+	]}
+>
+	<a
+		href={item.url}
+		target={item.target}
+		rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+		title={item.titleAttr}
+		aria-current={navCurrent(item.url)}
+	>
+		{item.label}
+		{hasChildren && <span class="site-nav__chevron" aria-hidden="true"></span>}
+	</a>
+	{
+		hasChildren && (
+			<ul class="site-nav__submenu">
+				{item.children?.map((child) => (
+					<Astro.self item={child} navCurrent={navCurrent} />
+				))}
+			</ul>
+		)
+	}
+</li>
