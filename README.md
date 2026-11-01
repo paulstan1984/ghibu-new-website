@@ -77,15 +77,19 @@ EmDash servește panoul de administrare și API-urile din aplicația Astro, deci
 npm run build:static
 ```
 
-Comanda construiește aplicația Node și apoi o pornește temporar pentru a exporta paginile publice și URL-urile din sitemap-ul EmDash în `dist-static/`. Ruleaz-o cu aceeași bază de date și aceleași fișiere media ca serviciul EmDash. După publicarea de conținut nou, regenerează și redeployează instantaneul; administrarea, căutarea cu rezultate, formularele și media rămân servite de aplicația Node.
+Comanda construiește aplicația Node și apoi o pornește temporar pentru a exporta paginile publice, URL-urile din sitemap-ul EmDash, fișierele JS/CSS/fonturile și toate fișierele media referite (`/_emdash/api/media/file/...` și `/wp-content/uploads/...`) în `dist-static/`. Fișierele WordPress care nu există local sunt descărcate de pe site-ul vechi. Rulează-o cu aceeași bază de date și aceleași fișiere media ca serviciul EmDash. După publicarea de conținut nou, regenerează și redeployează instantaneul; administrarea, căutarea cu rezultate și formularele rămân servite de aplicația Node.
 
-Publică `dist-static/` pe hostul static, iar aplicația Node separat, cu baza SQLite și directoarele media persistente. Pe domeniul public, configurează reverse proxy-ul să trimită `/_emdash/`, `/runtime/` și `/wp-content/uploads/` către serviciul Node. `/runtime/` trebuie să elimine prefixul înainte de proxy; `build:static` rescrie formularele și căutarea din HTML-ul exportat să folosească prefixul `/runtime` (modificabil cu `STATIC_RUNTIME_PREFIX`).
+Publică `dist-static/` pe hostul static, iar aplicația Node separat, cu baza SQLite și directoarele media persistente. Pe domeniul public, configurează reverse proxy-ul să trimită `/_emdash/` (administrare și API) și `/runtime/` către serviciul Node. `/runtime/` trebuie să elimine prefixul înainte de proxy; `build:static` rescrie formularele și căutarea din HTML-ul exportat să folosească prefixul `/runtime` (modificabil cu `STATIC_RUNTIME_PREFIX`). Fișierele media noi încărcate după export apar abia după următorul export.
 
 Exemplu Nginx (înlocuiește căile și portul cu valorile instalării):
 
 ```nginx
 root /srv/ghibu-site/dist-static;
 index index.html;
+
+location ^~ /_emdash/api/media/file/ {
+    try_files $uri =404;
+}
 
 location ^~ /_emdash/ {
     proxy_set_header Host $host;
@@ -97,14 +101,6 @@ location ^~ /_emdash/ {
 
 location ^~ /runtime/ {
     rewrite ^/runtime/(.*)$ /$1 break;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_pass http://127.0.0.1:4321;
-}
-
-location ^~ /wp-content/uploads/ {
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

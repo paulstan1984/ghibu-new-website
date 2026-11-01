@@ -104,21 +104,40 @@ function queuePath(value, paths, sourcePath, allowDifferentOrigin = false) {
 	url.search = "";
 	url.hash = "";
 	if (
-		url.pathname.startsWith("/_emdash/") ||
-		url.pathname === "/_emdash" ||
-		url.pathname.startsWith("/runtime/") ||
-		url.pathname.startsWith("/api/") ||
-		url.pathname.startsWith("/wp-content/uploads/")
+		!isMediaPath(url.pathname) &&
+		(url.pathname.startsWith("/_emdash/") ||
+			url.pathname === "/_emdash" ||
+			url.pathname.startsWith("/runtime/") ||
+			url.pathname.startsWith("/api/"))
 	) {
 		return;
 	}
 	paths.add(url.pathname);
 }
 
+const mediaPrefixes = ["/_emdash/api/media/file/", "/wp-content/uploads/"];
+
+function isMediaPath(pathname) {
+	return mediaPrefixes.some((prefix) => pathname.startsWith(prefix));
+}
+
 function linksFromHtml(html, pathname, paths) {
-	for (const match of html.matchAll(/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
-		const href = decodeEntities(match[1] ?? match[2] ?? "");
-		queuePath(href, paths, pathname);
+	const references = [];
+	for (const match of html.matchAll(
+		/\b(?:href|src|poster|data-src|srcset|data-srcset)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi,
+	)) {
+		references.push(decodeEntities(match[1] ?? match[2] ?? ""));
+	}
+	for (const match of html.matchAll(/url\(\s*(?:&quot;|["'])?([^)"'&\s]+)/gi)) {
+		references.push(decodeEntities(match[1]));
+	}
+
+	for (const reference of references) {
+		// srcset lists several "url descriptor" candidates separated by commas.
+		for (const candidate of reference.split(/,\s+/)) {
+			const target = candidate.trim().split(/\s+/)[0];
+			if (target) queuePath(target, paths, pathname);
+		}
 	}
 }
 
@@ -183,7 +202,27 @@ async function exportPages() {
 		for (const pathname of batch) visited.add(pathname);
 		await Promise.all(
 			batch.map(async (pathname) => {
-				const response = await fetch(new URL(pathname, origin), { redirect: "manual" });
+				const media = isMediaPath(pathname);
+				// Media may redirect to the legacy host when it is not stored locally; download it from there.
+				const response = await fetch(new URL(pathname, origin), {
+					redirect: media ? "follow" : "manual",
+				});
+				if (media) {
+					if (!response.ok) {
+						console.warn(`Skipping missing media ${pathname} (HTTP ${response.status}).`);
+						return;
+					}
+					const mediaType = response.headers.get("content-type") ?? "";
+					if (mediaType.includes("text/html")) {
+						console.warn(`Skipping media ${pathname}: received HTML instead of a file.`);
+						return;
+					}
+					const destination = outputPathFor(pathname, mediaType);
+					await mkdir(path.dirname(destination), { recursive: true });
+					await writeFile(destination, Buffer.from(await response.arrayBuffer()));
+					exported += 1;
+					return;
+				}
 				if (response.status >= 300 && response.status < 400) {
 					const location = response.headers.get("location");
 					if (!location) throw new Error(`${pathname} redirected without a Location header.`);
