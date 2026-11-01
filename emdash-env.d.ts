@@ -24,6 +24,21 @@ export interface Announcement {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface BwgShare {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  content?: PortableTextBlock[];
+  excerpt?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 export interface Course {
   id: string;
   slug: string | null;
@@ -62,6 +77,54 @@ export interface Event {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface LearncareCourse {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  content?: PortableTextBlock[];
+  excerpt?: string;
+  featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface LearncareEvent {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  content?: PortableTextBlock[];
+  excerpt?: string;
+  featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface LearncareTeacher {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  content?: PortableTextBlock[];
+  excerpt?: string;
+  featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 export interface Page {
   id: string;
   slug: string | null;
@@ -75,6 +138,22 @@ export interface Page {
   source_date?: string;
   has_form?: boolean;
   form_kind?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Post {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  content?: PortableTextBlock[];
+  excerpt?: string;
+  featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -105,9 +184,14 @@ export interface Teacher {
 declare module "emdash" {
   interface EmDashCollections {
     announcements: Announcement;
+    bwg_share: BwgShare;
     courses: Course;
     events: Event;
+    learncare_courses: LearncareCourse;
+    learncare_events: LearncareEvent;
+    learncare_teachers: LearncareTeacher;
     pages: Page;
+    posts: Post;
     teachers: Teacher;
   }
 }
