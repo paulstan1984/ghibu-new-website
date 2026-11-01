@@ -1,0 +1,19 @@
+---
+import { localizeWordPressMedia } from "../utils/wordpress-media";
+
+const { node, index, isInline, ...attrs } = Astro.props;
+const source = node.markDef.href;
+const parsedUrl = (() => {
+	try {
+		return source ? new URL(source, Astro.url) : undefined;
+	} catch {
+		return undefined;
+	}
+})();
+const href =
+	parsedUrl && ["http:", "https:", "mailto:", "tel:"].includes(parsedUrl.protocol)
+		? localizeWordPressMedia(source)
+		: "#";
+---
+
+<a href={href} {...attrs}><slot /></a>

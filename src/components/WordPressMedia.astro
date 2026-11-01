@@ -1,0 +1,108 @@
+---
+interface Props {
+	node: {
+		kind?: string;
+		src?: string;
+		poster?: string;
+		title?: string;
+	};
+}
+
+const { kind, src, poster, title = "" } = Astro.props.node;
+const parseUrl = (value?: string) => {
+	try {
+		return value ? new URL(value, Astro.url) : undefined;
+	} catch {
+		return undefined;
+	}
+};
+const mediaUrl = parseUrl(src);
+const safeLinkSource = mediaUrl && ["http:", "https:"].includes(mediaUrl.protocol);
+const localUpload =
+	mediaUrl?.origin === Astro.url.origin &&
+	mediaUrl.pathname.startsWith("/wp-content/uploads/");
+const trustedLegacyHost = mediaUrl?.hostname === "www.liceul-onisifor-ghibu.ro";
+const safeAudioVideoSource =
+	(localUpload && ["http:", "https:"].includes(mediaUrl.protocol)) ||
+		(mediaUrl?.protocol === "https:" && trustedLegacyHost);
+const safeIframeSource =
+	(localUpload && mediaUrl.pathname.toLowerCase().endsWith(".pdf")) ||
+		(mediaUrl?.protocol === "https:" &&
+			((["youtube.com", "www.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(
+				mediaUrl.hostname,
+			) &&
+				mediaUrl.pathname.startsWith("/embed/")) ||
+				(mediaUrl.hostname === "www.google.com" &&
+					mediaUrl.pathname.startsWith("/maps/embed"))));
+const posterUrl = parseUrl(poster);
+const safePoster =
+	posterUrl?.origin === Astro.url.origin &&
+	posterUrl.pathname.startsWith("/wp-content/uploads/")
+		? posterUrl.href
+		: undefined;
+const label = title || "Conținut media";
+---
+
+{mediaUrl && kind === "audio" && safeAudioVideoSource && (
+	<audio class="wordpress-media" controls preload="metadata" src={mediaUrl.href}>
+		<a href={mediaUrl.href}>{label}</a>
+	</audio>
+)}
+{mediaUrl && kind === "video" && safeAudioVideoSource && (
+	<video
+		class="wordpress-media"
+		controls
+		preload="metadata"
+		src={mediaUrl.href}
+		poster={safePoster}
+	>
+		<a href={mediaUrl.href}>{label}</a>
+	</video>
+)}
+{mediaUrl && kind === "iframe" && safeIframeSource && (
+	<iframe
+		class="wordpress-media wordpress-media--frame"
+		src={mediaUrl.href}
+		title={label}
+		loading="lazy"
+		referrerpolicy="strict-origin-when-cross-origin"
+		allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+		allowfullscreen
+	/>
+)}
+{mediaUrl &&
+	safeLinkSource &&
+	((kind === "audio" || kind === "video") && !safeAudioVideoSource ||
+		kind === "iframe" && !safeIframeSource) && (
+		<p class="wordpress-media__fallback">
+			<a href={mediaUrl.href}>{label}</a>
+		</p>
+	)}
+
+<style>
+	.wordpress-media {
+		display: block;
+		width: 100%;
+		margin-block: 1.5rem;
+	}
+
+	audio.wordpress-media {
+		height: 3rem;
+	}
+
+	video.wordpress-media {
+		max-height: 42rem;
+		border-radius: var(--radius-lg);
+		background: var(--color-fill);
+	}
+
+	.wordpress-media--frame {
+		min-height: 34rem;
+		border: 0;
+		border-radius: var(--radius-lg);
+	}
+
+	.wordpress-media__fallback {
+		margin-block: 1.5rem;
+	}
+</style>

@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import re
 import unicodedata
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import quote, unquote, urljoin, urlsplit
 
 
 SITE_ORIGIN = "https://www.liceul-onisifor-ghibu.ro"
@@ -215,13 +215,13 @@ def media_url(source: str | None, uploads: Path) -> str | None:
     parsed = urlsplit(absolute)
     marker = "/wp-content/uploads/"
     path = parsed.path
-    if marker not in path:
+    if parsed.hostname != urlsplit(SITE_ORIGIN).hostname or marker not in path:
         return absolute
-    relative = path.split(marker, 1)[1]
-    local_path = uploads.joinpath(*relative.split("/"))
-    if local_path.is_file():
-        return marker + relative
-    return absolute
+    relative = unquote(path.split(marker, 1)[1])
+    parts = relative.split("/")
+    if not relative or any(part in ("", ".", "..") or "\\" in part for part in parts):
+        return absolute
+    return marker + "/".join(quote(part, safe="") for part in parts)
 
 
 class PortableTextParser(HTMLParser):
@@ -242,6 +242,7 @@ class PortableTextParser(HTMLParser):
         self.uploads = uploads
         self.blocks: list[dict] = []
         self.current: dict | None = None
+        self.current_media: dict[str, str] | None = None
         self.marks: list[tuple[str, str | None]] = []
         self.list_stack: list[str] = []
         self.sequence = 0
@@ -274,12 +275,54 @@ class PortableTextParser(HTMLParser):
         while children and not children[-1].get("text", "").strip():
             children.pop()
         if children:
+            if isinstance(self.current.get("markDefs"), dict):
+                self.current["markDefs"] = list(self.current["markDefs"].values())
             self.blocks.append(self.current)
         self.current = None
 
+    def finish_media(self):
+        if not self.current_media:
+            return
+        source = self.current_media.get("src")
+        if source:
+            self.blocks.append(
+                {
+                    "_type": "wordpressMedia",
+                    "_key": self.key("media"),
+                    "kind": self.current_media["kind"],
+                    "src": media_url(source, self.uploads),
+                    "poster": media_url(self.current_media.get("poster"), self.uploads),
+                    "title": self.current_media.get("title", ""),
+                }
+            )
+        self.current_media = None
+
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]):
         attributes = dict(attrs)
-        if tag in self.block_tags:
+        if tag in ("audio", "video"):
+            self.finish()
+            self.current_media = {
+                "kind": tag,
+                "src": attributes.get("src") or "",
+                "poster": attributes.get("poster") or "",
+                "title": attributes.get("title") or "",
+            }
+        elif tag == "source" and self.current_media and not self.current_media.get("src"):
+            self.current_media["src"] = attributes.get("src") or ""
+        elif tag == "iframe":
+            source = attributes.get("src")
+            if source:
+                self.finish()
+                self.blocks.append(
+                    {
+                        "_type": "wordpressMedia",
+                        "_key": self.key("media"),
+                        "kind": "iframe",
+                        "src": media_url(source, self.uploads),
+                        "title": attributes.get("title") or "",
+                    }
+                )
+        elif tag in self.block_tags:
             self.begin(self.block_tags[tag])
         elif tag in ("ul", "ol"):
             self.list_stack.append("number" if tag == "ol" else "bullet")
@@ -297,6 +340,7 @@ class PortableTextParser(HTMLParser):
         elif tag == "a":
             href = attributes.get("href")
             if href:
+                href = media_url(href, self.uploads) or href
                 mark_key = self.key("link")
                 self.current_mark_defs[mark_key] = {
                     "_key": mark_key,
@@ -327,7 +371,9 @@ class PortableTextParser(HTMLParser):
         return self.current.setdefault("markDefs", {})
 
     def handle_endtag(self, tag: str):
-        if tag in self.block_tags or tag == "li":
+        if tag in ("audio", "video"):
+            self.finish_media()
+        elif tag in self.block_tags or tag == "li":
             self.finish()
         elif tag in ("ul", "ol") and self.list_stack:
             self.list_stack.pop()
@@ -368,6 +414,7 @@ def portable_text(markup: str, uploads: Path) -> list[dict]:
     parser = PortableTextParser(uploads)
     parser.feed(markup)
     parser.close()
+    parser.finish_media()
     parser.finish()
     return parser.blocks
 

@@ -1,8 +1,11 @@
 node_modules
 dist
+dist-static
 .astro
 .emdash/migrations.json
 uploads
+!src/pages/wp-content/uploads/
+!src/pages/wp-content/uploads/[...path].ts
 data.db
 data.db-*
 

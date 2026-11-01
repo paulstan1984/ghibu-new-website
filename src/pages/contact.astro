@@ -4,6 +4,8 @@ import { PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
 import SchoolForm from "../components/SchoolForm.astro";
 import WordPressImage from "../components/WordPressImage.astro";
+import WordPressLink from "../components/WordPressLink.astro";
+import { normalizeWordPressMarkDefinitions } from "../utils/wordpress-media";
 
 const { entry: page, error, cacheHint } = await getEmDashEntry("pages", "contact");
 if (error) return new Response("Nu am putut încărca pagina de contact.", { status: 500 });
@@ -51,8 +53,11 @@ if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 				{page?.data.content?.length ? (
 					<div class="school-contact-source prose">
 						<PortableText
-							value={page.data.content}
-							components={{ type: { wordpressImage: WordPressImage } }}
+							value={normalizeWordPressMarkDefinitions(page.data.content)}
+							components={{
+								type: { wordpressImage: WordPressImage },
+								mark: { link: WordPressLink },
+							}}
 						/>
 					</div>
 				) : null}

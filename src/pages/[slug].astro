@@ -4,6 +4,9 @@ import { PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
 import SchoolForm from "../components/SchoolForm.astro";
 import WordPressImage from "../components/WordPressImage.astro";
+import WordPressLink from "../components/WordPressLink.astro";
+import WordPressMedia from "../components/WordPressMedia.astro";
+import { normalizeWordPressMarkDefinitions } from "../utils/wordpress-media";
 import "../styles/prose.css";
 
 const slug = decodeSlug(Astro.params.slug);
@@ -31,8 +34,11 @@ const formKind =
 			</header>
 			<div class="prose page__body" {...entry.edit.content}>
 				<PortableText
-					value={entry.data.content ?? []}
-					components={{ type: { wordpressImage: WordPressImage } }}
+					value={normalizeWordPressMarkDefinitions(entry.data.content ?? [])}
+					components={{
+						type: { wordpressImage: WordPressImage, wordpressMedia: WordPressMedia },
+						mark: { link: WordPressLink },
+					}}
 				/>
 			</div>
 			{entry.data.has_form && <SchoolForm variant={formKind} />}
