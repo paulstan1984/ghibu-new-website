@@ -1,0 +1,6 @@
+---
+// Redirect /admin/* paths to /_emdash/admin/*
+const path = Astro.params.path || '';
+const destination = `/_emdash/admin/${path}`;
+return Astro.redirect(destination, 301);
+---
